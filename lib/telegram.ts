@@ -1,0 +1,211 @@
+// Telegram Bot utilities for LAST NIGHT OF THE YEAR GIRLS
+
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!;
+const ORGANIZER_CHAT_ID = process.env.ORGANIZER_CHAT_ID!;
+const BASE_URL = `https://api.telegram.org/bot${BOT_TOKEN}`;
+
+async function sendMessage(chatId: string | number, text: string, parseMode = "HTML") {
+  try {
+    const res = await fetch(`${BASE_URL}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text,
+        parse_mode: parseMode,
+      }),
+    });
+    const data = await res.json();
+    if (!data.ok) {
+      console.error("Telegram error:", data.description);
+    }
+    return data;
+  } catch (err) {
+    console.error("Failed to send Telegram message:", err);
+  }
+}
+
+// ─── TO ORGANIZER ──────────────────────────────────────────────
+
+export async function notifyOrganizerNewApplication(app: {
+  applicationId: string;
+  name: string;
+  age: number;
+  telegram: string;
+  contact: string;
+  wishes?: string | null;
+  allergies?: string | null;
+  foodWishes?: string | null;
+}) {
+  const text = `
+🔔 <b>Новая заявка!</b>
+
+📋 ID: <code>${app.applicationId}</code>
+👤 Имя: ${app.name}
+🔢 Возраст: ${app.age}
+📱 Telegram: ${app.telegram}
+📞 Контакт: ${app.contact}
+${app.allergies ? `⚠️ Аллергии: ${app.allergies}` : ""}
+${app.foodWishes ? `🍽️ Пожелания к закускам: ${app.foodWishes}` : ""}
+${app.wishes ? `💬 Пожелания: ${app.wishes}` : ""}
+
+👉 Зайди в <a href="${process.env.NEXT_PUBLIC_ADMIN_URL}/admin">админ-панель</a> для рассмотрения.
+  `.trim();
+
+  await sendMessage(ORGANIZER_CHAT_ID, text);
+}
+
+export async function notifyOrganizerPaymentConfirmed(app: {
+  applicationId: string;
+  name: string;
+  telegram: string;
+}) {
+  const text = `
+✅ <b>Оплата подтверждена!</b>
+
+📋 ID: <code>${app.applicationId}</code>
+👤 Имя: ${app.name}
+📱 Telegram: ${app.telegram}
+
+💰 Сумма: 3 500 ₽
+  `.trim();
+
+  await sendMessage(ORGANIZER_CHAT_ID, text);
+}
+
+export async function notifyOrganizerReservationExpired(app: {
+  applicationId: string;
+  name: string;
+  telegram: string;
+}) {
+  const text = `
+⏰ <b>Резерв истёк!</b>
+
+📋 ID: <code>${app.applicationId}</code>
+👤 Имя: ${app.name}
+📱 Telegram: ${app.telegram}
+
+Место освобождено автоматически.
+  `.trim();
+
+  await sendMessage(ORGANIZER_CHAT_ID, text);
+}
+
+// ─── TO PARTICIPANT ────────────────────────────────────────────
+
+export async function notifyParticipantApplicationReceived(
+  telegramUsername: string,
+  applicationId: string
+) {
+  // Note: We can only message users who have started the bot first
+  // So we send via username-based approach (requires user to have messaged bot)
+  const text = `
+🖤 Привет!
+
+Мы получили твою заявку на <b>LAST NIGHT OF THE YEAR GIRLS</b>.
+
+📋 Номер заявки: <code>${applicationId}</code>
+
+Организатор рассмотрит её в ближайшее время и свяжется с тобой здесь. 
+
+Следи за сообщениями! 🥂
+  `.trim();
+
+  // Since we can't initiate a conversation by username alone,
+  // this will be queued and sent when we have their chat_id.
+  // For now, log it - actual delivery happens after user starts bot.
+  console.log(`[Telegram] Would notify ${telegramUsername}: ${text}`);
+}
+
+export async function notifyParticipantApproved(
+  chatId: string | number,
+  name: string,
+  applicationId: string
+) {
+  const text = `
+🎉 <b>${name}, твоя заявка одобрена!</b>
+
+📋 ID: <code>${applicationId}</code>
+
+Для оплаты и подтверждения места переведи <b>3 500 ₽</b> через СБП:
+
+📱 Номер телефона: <code>+7 950 029-89-46</code>
+💳 Система: СБП (Система быстрых платежей)
+💰 Сумма: <b>3 500 рублей</b> ровно
+
+В комментарии к переводу укажи свой номер заявки: <code>${applicationId}</code>
+
+⏰ Место зарезервировано за тобой на <b>48 часов</b>.
+После перевода напиши организатору для подтверждения.
+
+🖤 LAST NIGHT OF THE YEAR GIRLS
+  `.trim();
+
+  await sendMessage(chatId, text);
+}
+
+export async function notifyParticipantRejected(
+  chatId: string | number,
+  name: string
+) {
+  const text = `
+💔 ${name}, к сожалению, на этот раз не получилось.
+
+Организатор рассмотрел твою заявку, но все места уже заняты или ты не прошла отбор.
+
+Спасибо, что проявила интерес к вечеринке 🖤
+  `.trim();
+
+  await sendMessage(chatId, text);
+}
+
+export async function notifyParticipantWaitlist(
+  chatId: string | number,
+  name: string,
+  applicationId: string
+) {
+  const text = `
+🕐 <b>${name}, ты в листе ожидания!</b>
+
+📋 ID: <code>${applicationId}</code>
+
+Все основные места сейчас заняты, но ты следующая в очереди. Если кто-то откажется — мы сразу свяжемся с тобой.
+
+🖤 LAST NIGHT OF THE YEAR GIRLS
+  `.trim();
+
+  await sendMessage(chatId, text);
+}
+
+export async function notifyParticipantPaymentConfirmed(
+  chatId: string | number,
+  name: string
+) {
+  const text = `
+✅ <b>${name}, оплата подтверждена!</b>
+
+Ты в списке участниц <b>LAST NIGHT OF THE YEAR GIRLS</b> 🖤
+
+📅 19 декабря 2026, 20:00
+📍 Санкт-Петербург (адрес пришлём за 2 недели до мероприятия)
+
+До встречи! 🥂✨
+  `.trim();
+
+  await sendMessage(chatId, text);
+}
+
+export async function notifyParticipantReservationExpired(
+  chatId: string | number,
+  name: string
+) {
+  const text = `
+⏰ ${name}, время оплаты истекло.
+
+К сожалению, 48 часов прошли, и место было освобождено. Если ты хочешь попробовать снова — напиши организатору.
+
+🖤 LAST NIGHT OF THE YEAR GIRLS
+  `.trim();
+
+  await sendMessage(chatId, text);
+}

@@ -1,0 +1,84 @@
+// Prisma schema for LAST NIGHT OF THE YEAR GIRLS
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Application {
+  id            String   @id @default(uuid())
+  applicationId String   @unique // LNG-001, LNG-002...
+  name          String
+  age           Int
+  telegram      String
+  contact       String
+  wishes        String?
+  allergies     String?
+  foodWishes    String?
+  status        ApplicationStatus @default(NEW)
+  isWaitlist    Boolean  @default(false)
+  reservedUntil DateTime?
+  adminNotes    String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  payments      Payment[]
+
+  @@map("applications")
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  applicationId String
+  application   Application   @relation(fields: [applicationId], references: [id])
+  amount        Int           @default(3500)
+  status        PaymentStatus @default(PENDING)
+  confirmedBy   String?
+  confirmedAt   DateTime?
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@map("payments")
+}
+
+model Admin {
+  id           String   @id @default(uuid())
+  login        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  @@map("admins")
+}
+
+model Setting {
+  key       String @id
+  value     String
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
+}
+
+enum ApplicationStatus {
+  NEW
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  PAYMENT_PENDING
+  PAID
+  CANCELLED
+  REFUND_PENDING
+  REFUNDED
+  WAITLIST
+}
+
+enum PaymentStatus {
+  PENDING
+  CONFIRMED
+  REFUNDED
+}

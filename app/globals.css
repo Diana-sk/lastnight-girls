@@ -1,26 +1,343 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Dancing+Script:wght@400;600;700&family=Inter:wght@300;400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --black: #080808;
+  --dark: #111111;
+  --burgundy: #6B0F1A;
+  --crimson: #C41E3A;
+  --red: #B22222;
+  --cream: #F5F0E8;
+  --parchment: #EDE0C4;
+  --silver: #C0C0C0;
+  --gold: #C9A96E;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--black);
+  color: var(--cream);
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
 }
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--black);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--burgundy);
+  border-radius: 2px;
+}
+
+/* ─── TYPOGRAPHY ─────────────────────────────── */
+.font-playfair   { font-family: 'Playfair Display', serif; }
+.font-cormorant  { font-family: 'Cormorant Garamond', serif; }
+.font-dancing    { font-family: 'Dancing Script', cursive; }
+
+/* ─── GLITTER PARTICLES ──────────────────────── */
+.glitter-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.glitter-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--silver);
+  animation: glitterFall linear infinite;
+  opacity: 0;
+}
+
+@keyframes glitterFall {
+  0%   { transform: translateY(-10px) rotate(0deg); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 0.6; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* ─── MAGAZINE CUTOUT CARDS ─────────────────── */
+.cutout-card {
+  background: var(--cream);
+  color: #1a1a1a;
+  position: relative;
+  padding: 1.25rem 1.5rem;
+  border-radius: 2px;
+  box-shadow: 4px 4px 20px rgba(0,0,0,0.6);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+.cutout-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Torn paper edge effect */
+.torn-edge-top {
+  position: relative;
+  overflow: hidden;
+}
+.torn-edge-top::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: var(--black);
+  clip-path: polygon(
+    0% 0%, 3% 100%, 6% 20%, 9% 90%, 12% 10%,
+    15% 80%, 18% 5%, 21% 95%, 24% 15%, 27% 85%,
+    30% 0%, 33% 90%, 36% 20%, 39% 80%, 42% 5%,
+    45% 100%, 48% 15%, 51% 85%, 54% 0%, 57% 95%,
+    60% 20%, 63% 75%, 66% 10%, 69% 90%, 72% 5%,
+    75% 85%, 78% 15%, 81% 95%, 84% 10%, 87% 80%,
+    90% 0%, 93% 90%, 96% 20%, 100% 0%
+  );
+}
+
+/* ─── BOW SVG DECORATION ────────────────────── */
+.bow-decoration {
+  width: 60px;
+  height: 45px;
+  display: inline-block;
+}
+
+/* ─── SECTION TRANSITIONS ───────────────────── */
+.section-fade {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.section-fade.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── PHOTO FLASH EFFECT ────────────────────── */
+.photo-flash {
+  filter: contrast(1.1) brightness(1.05) saturate(0.9);
+  transition: filter 0.3s ease;
+}
+.photo-flash:hover {
+  filter: contrast(1.2) brightness(1.15) saturate(1.1);
+}
+
+/* ─── HERO SECTION ──────────────────────────── */
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--cream);
+  text-shadow:
+    0 0 40px rgba(180, 20, 30, 0.4),
+    2px 2px 0 rgba(0,0,0,0.8);
+}
+
+.hero-girls {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-style: italic;
+  color: var(--crimson);
+  text-shadow:
+    0 0 60px rgba(196, 30, 58, 0.7),
+    0 0 100px rgba(196, 30, 58, 0.3),
+    2px 2px 0 rgba(0,0,0,0.6);
+}
+
+/* ─── CTA BUTTON ────────────────────────────── */
+.cta-button {
+  display: inline-block;
+  font-family: 'Playfair Display', serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cream);
+  border: 1.5px solid var(--crimson);
+  padding: 1rem 2.5rem;
+  position: relative;
+  transition: all 0.3s ease;
+  background: transparent;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.cta-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--crimson);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.cta-button span {
+  position: relative;
+  z-index: 1;
+}
+
+.cta-button:hover::before {
+  transform: scaleX(1);
+}
+
+.cta-button:hover {
+  color: var(--cream);
+  box-shadow: 0 0 30px rgba(196, 30, 58, 0.5);
+}
+
+/* ─── FORM STYLES ───────────────────────────── */
+.form-field {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--cream);
+  padding: 0.875rem 1rem;
+  width: 100%;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  transition: border-color 0.3s ease, background 0.3s ease;
+  border-radius: 0;
+  outline: none;
+}
+
+.form-field:focus {
+  border-color: var(--crimson);
+  background: rgba(196, 30, 58, 0.06);
+}
+
+.form-field::placeholder {
+  color: rgba(245, 240, 232, 0.35);
+}
+
+textarea.form-field {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* ─── FAQ STYLES ────────────────────────────── */
+.faq-item {
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.faq-question {
+  padding: 1.25rem 0;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  transition: color 0.3s ease;
+}
+
+.faq-question:hover {
+  color: var(--crimson);
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.4s ease;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: rgba(245, 240, 232, 0.75);
+}
+
+.faq-answer.open {
+  max-height: 300px;
+  padding-bottom: 1.25rem;
+}
+
+/* ─── COLLAGE ELEMENTS ──────────────────────── */
+.collage-rotate-1 { transform: rotate(-2deg); }
+.collage-rotate-2 { transform: rotate(1.5deg); }
+.collage-rotate-3 { transform: rotate(-1deg); }
+.collage-rotate-4 { transform: rotate(2.5deg); }
+
+/* ─── STAR DECORATION ───────────────────────── */
+.star-deco {
+  display: inline-block;
+  animation: starPulse 3s ease-in-out infinite;
+}
+@keyframes starPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1) rotate(0deg); }
+  50%       { opacity: 1;   transform: scale(1.2) rotate(180deg); }
+}
+
+/* ─── DIVIDER ───────────────────────────────── */
+.ornament-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--crimson);
+  opacity: 0.6;
+}
+.ornament-divider::before,
+.ornament-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--crimson), transparent);
+}
+
+/* ─── MOBILE FIXES ──────────────────────────── */
+@media (max-width: 768px) {
+  .hero-title { font-size: clamp(2.5rem, 12vw, 6rem); }
+  .hero-girls { font-size: clamp(3rem, 15vw, 7rem); }
+  .cutout-card { transform: none !important; }
+}
+
+/* ─── ADMIN PANEL ───────────────────────────── */
+.admin-card {
+  background: #161616;
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  padding: 1.5rem;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 2px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.status-NEW            { background: #1a3a4a; color: #7ec8e3; }
+.status-UNDER_REVIEW   { background: #2a2a1a; color: #e3c87e; }
+.status-APPROVED       { background: #1a3a1a; color: #7ee39c; }
+.status-REJECTED       { background: #3a1a1a; color: #e37e7e; }
+.status-PAYMENT_PENDING{ background: #2a1a3a; color: #c87ee3; }
+.status-PAID           { background: #0d2b0d; color: #4ade80; border: 1px solid #16a34a; }
+.status-CANCELLED      { background: #2a2a2a; color: #888; }
+.status-REFUND_PENDING { background: #3a2a1a; color: #e3a87e; }
+.status-REFUNDED       { background: #1a2a3a; color: #7ea8e3; }
+.status-WAITLIST       { background: #1a1a3a; color: #a87ee3; }
