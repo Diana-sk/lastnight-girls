@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 type ApplicationStatus =
   | "NEW" | "UNDER_REVIEW" | "APPROVED" | "REJECTED"
   | "PAYMENT_PENDING" | "PAID" | "CANCELLED"
-  | "REFUND_PENDING" | "REFUNDED" | "WAITLIST";
+  | "REFUND_PENDING" | "REFUNDED" | "WAITLIST" | "EXPIRED";
 
 interface Application {
   id: string;
@@ -43,12 +43,13 @@ const STATUS_LABELS: Record<ApplicationStatus, string> = {
   REFUND_PENDING: "Ожидается возврат",
   REFUNDED: "Возвращено",
   WAITLIST: "Лист ожидания",
+  EXPIRED: "Резерв истёк",
 };
 
 const ALL_STATUSES: ApplicationStatus[] = [
   "NEW", "UNDER_REVIEW", "APPROVED", "REJECTED",
   "PAYMENT_PENDING", "PAID", "CANCELLED",
-  "REFUND_PENDING", "REFUNDED", "WAITLIST"
+  "REFUND_PENDING", "REFUNDED", "WAITLIST", "EXPIRED"
 ];
 
 export default function AdminDashboard() {

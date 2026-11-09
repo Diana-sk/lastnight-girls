@@ -369,6 +369,7 @@ body {
 .status-REFUND_PENDING { color: #e3a87e; background: rgba(227, 168, 126, 0.1); border: 1px solid rgba(227, 168, 126, 0.25); }
 .status-REFUNDED { color: #7ea8e3; background: rgba(126, 168, 227, 0.1); border: 1px solid rgba(126, 168, 227, 0.25); }
 .status-WAITLIST { color: #a87ee3; background: rgba(168, 126, 227, 0.1); border: 1px solid rgba(168, 126, 227, 0.25); }
+.status-EXPIRED { color: #e3977e; background: rgba(227, 151, 126, 0.1); border: 1px solid rgba(227, 151, 126, 0.25); }
 
 /* Тонкий скроллбар экрана фотоаппарата (программа вечера) */
 .program-scroll {
