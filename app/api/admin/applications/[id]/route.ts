@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { verifyAdminToken, unauthorized } from "../route";
+import { verifyAdminToken, unauthorized, withDbRetry } from "../route";
 import {
   notifyParticipantApproved,
   notifyParticipantRejected,
@@ -20,14 +20,20 @@ export async function PATCH(
     const body = await req.json();
     const { action, adminNotes, participantChatId } = body;
 
-    const application = await prisma.application.findUnique({
-      where: { id },
-      include: { payments: true },
-    });
+    const application = await withDbRetry(() =>
+      prisma.application.findUnique({
+        where: { id },
+        include: { payments: true },
+      })
+    );
 
     if (!application) {
       return NextResponse.json({ error: "Заявка не найдена" }, { status: 404 });
     }
+
+    // chat_id участницы: приоритет — ручной ввод из админки,
+    // иначе автопривязка из бота (participantChatId в заявке)
+    const effectiveChatId = participantChatId || application.participantChatId || null;
 
     const updateData: {
       status?: ApplicationStatus;
@@ -46,9 +52,9 @@ export async function PATCH(
         updateData.status = "APPROVED";
         // 48 hours reservation
         updateData.reservedUntil = new Date(now.getTime() + 48 * 60 * 60 * 1000);
-        if (participantChatId) {
+        if (effectiveChatId) {
           await notifyParticipantApproved(
-            participantChatId,
+            effectiveChatId,
             application.name,
             application.applicationId
           );
@@ -59,17 +65,17 @@ export async function PATCH(
       case "reject": {
         updateData.status = "REJECTED";
         updateData.reservedUntil = null;
-        if (participantChatId) {
-          await notifyParticipantRejected(participantChatId, application.name);
+        if (effectiveChatId) {
+          await notifyParticipantRejected(effectiveChatId, application.name);
         }
         break;
       }
 
       case "send_payment": {
         updateData.status = "PAYMENT_PENDING";
-        if (participantChatId) {
+        if (effectiveChatId) {
           await notifyParticipantApproved(
-            participantChatId,
+            effectiveChatId,
             application.name,
             application.applicationId
           );
@@ -107,8 +113,8 @@ export async function PATCH(
           });
         }
 
-        if (participantChatId) {
-          await notifyParticipantPaymentConfirmed(participantChatId, application.name);
+        if (effectiveChatId) {
+          await notifyParticipantPaymentConfirmed(effectiveChatId, application.name);
         }
 
         await notifyOrganizerPaymentConfirmed({
@@ -149,11 +155,13 @@ export async function PATCH(
         return NextResponse.json({ error: "Неизвестное действие" }, { status: 400 });
     }
 
-    const updatedApp = await prisma.application.update({
-      where: { id },
-      data: updateData,
-      include: { payments: true },
-    });
+    const updatedApp = await withDbRetry(() =>
+      prisma.application.update({
+        where: { id },
+        data: updateData,
+        include: { payments: true },
+      })
+    );
 
     return NextResponse.json({
       success: true,

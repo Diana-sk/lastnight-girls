@@ -31,6 +31,11 @@ async function sendMessage(chatId: string | number, text: string, parseMode = "H
   }
 }
 
+// Публичная обёртка — для ответов бота пользователям (вебхук).
+export async function sendMessageToUser(chatId: string | number, text: string) {
+  return sendMessage(chatId, text);
+}
+
 // ─── TO ORGANIZER ──────────────────────────────────────────────
 
 export async function notifyOrganizerNewApplication(app: {
@@ -92,6 +97,24 @@ export async function notifyOrganizerReservationExpired(app: {
 📱 Telegram: ${app.telegram}
 
 Место освобождено автоматически.
+  `.trim();
+
+  await sendMessage(ORGANIZER_CHAT_ID, text);
+}
+
+export async function notifyOrganizerParticipantLinked(app: {
+  applicationId: string;
+  name: string;
+  telegram: string;
+}) {
+  const text = `
+🔗 <b>Участница на связи!</b>
+
+📋 ID: <code>${app.applicationId}</code>
+👤 Имя: ${app.name}
+📱 Telegram: ${app.telegram}
+
+Она запустила бота — chat_id привязан к заявке автоматически. Теперь все уведомления дойдут до неё.
   `.trim();
 
   await sendMessage(ORGANIZER_CHAT_ID, text);

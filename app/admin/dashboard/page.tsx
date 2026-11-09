@@ -20,6 +20,7 @@ interface Application {
   status: ApplicationStatus;
   isWaitlist: boolean;
   reservedUntil: string | null;
+  participantChatId: string | null;
   adminNotes: string | null;
   createdAt: string;
   updatedAt: string;
@@ -289,7 +290,7 @@ export default function AdminDashboard() {
                     {applications.map((app) => (
                       <div
                         key={app.id}
-                        onClick={() => { setSelectedApp(app); setNotes(app.adminNotes || ""); setActionMsg(""); }}
+                        onClick={() => { setSelectedApp(app); setNotes(app.adminNotes || ""); setChatId(app.participantChatId || ""); setActionMsg(""); }}
                         style={{
                           background: selectedApp?.id === app.id ? "#1e1010" : "#161616",
                           border: selectedApp?.id === app.id ? "1px solid rgba(196,30,58,0.5)" : "1px solid #2a2a2a",
@@ -424,6 +425,9 @@ export default function AdminDashboard() {
                   <div style={{ marginBottom: "0.75rem" }}>
                     <div style={{ fontSize: "0.7rem", letterSpacing: "0.15em", color: "#555", marginBottom: "0.35rem" }}>
                       TELEGRAM CHAT ID (для уведомления участницы)
+                      {selectedApp.participantChatId && (
+                        <span style={{ color: "#7ee39c" }}> — привязан ботом ✓</span>
+                      )}
                     </div>
                     <input
                       type="text"

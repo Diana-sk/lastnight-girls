@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { withDbRetry } from "../applications/route";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -14,7 +15,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Введи логин и пароль." }, { status: 400 });
     }
 
-    const admin = await prisma.admin.findUnique({ where: { login } });
+    const admin = await withDbRetry(() => prisma.admin.findUnique({ where: { login } }));
     if (!admin) {
       return NextResponse.json({ error: "Неверный логин или пароль." }, { status: 401 });
     }
