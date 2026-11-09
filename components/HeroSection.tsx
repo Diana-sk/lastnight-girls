@@ -1,217 +1,192 @@
 "use client";
+import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import { ArrowRight, Maximize2, Sparkles, X } from "lucide-react";
+import ScrollFade from "./ScrollFade";
+
+interface BaubleDef {
+  src: string;
+  alt: string;
+  className: string;
+  stringClassName: string;
+  delay: string;
+}
+
+const baubles: BaubleDef[] = [
+  {
+    src: "/images/bauble-disco.jpg",
+    alt: "Диско-шар — фрагмент постера",
+    className: "left-[-3%] sm:left-[3%] xl:left-[8%] top-[5%] sm:top-[16%] w-20 sm:w-44 xl:w-56",
+    stringClassName: "h-[50vh] min-h-32",
+    delay: "0s",
+  },
+  {
+    src: "/images/bauble-glasses.jpg",
+    alt: "Бокалы шампанского — фрагмент постера",
+    className: "right-[-3%] sm:right-[3%] xl:right-[8%] top-[9%] sm:top-[22%] w-24 sm:w-48 xl:w-64",
+    stringClassName: "h-[50vh] min-h-32",
+    delay: "1.4s",
+  },
+];
+
+function Bauble({ b }: { b: BaubleDef }) {
+  return (
+    <div className={`absolute ${b.className} pointer-events-none`}>
+      {/* string: белая, тянется вверх до самого края страницы */}
+      <div
+        className={`absolute left-1/2 -translate-x-1/2 bottom-full w-px ${b.stringClassName} bg-white/70`}
+      />
+      {/* cap */}
+      <div
+        className="relative z-10 w-3.5 sm:w-4 h-2.5 sm:h-3 mx-auto rounded-t-[3px] bg-gradient-to-b from-[#E2C889] to-[#9A7B3F] shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
+        style={{ clipPath: "polygon(18% 0, 82% 0, 100% 100%, 0 100%)" }}
+      />
+      {/* ball: без обводки — край задаёт сама картинка */}
+      <div
+        className="ornament-sway relative aspect-square w-full rounded-full overflow-hidden shadow-[0_14px_36px_rgba(0,0,0,0.55)]"
+        style={{ animationDelay: b.delay, transformOrigin: "50% 0%" }}
+      >
+        <Image src={b.src} alt={b.alt} fill sizes="280px" className="object-cover" />
+        <div className="absolute inset-0 rounded-full shadow-[inset_0_0_26px_rgba(0,0,0,0.4)]" />
+        <div className="absolute top-[7%] left-[13%] w-[24%] h-[13%] rounded-full bg-white/25 blur-[3px] -rotate-12" />
+      </div>
+    </div>
+  );
+}
 
 export default function HeroSection() {
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
   return (
-    <section
-      id="hero"
-      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
-      style={{ background: "linear-gradient(170deg, #0a0a0a 0%, #0f0305 60%, #160208 100%)" }}
-    >
-      {/* Background collage images */}
-      <div className="absolute inset-0 pointer-events-none select-none">
-        {/* Top-left: Christmas table with candles */}
-        <div
-          className="absolute top-0 left-0 w-[40%] h-[55%] opacity-30 collage-rotate-1"
-          style={{ mixBlendMode: "luminosity" }}
-        >
-          <Image src="/images/img6.jpg" alt="" fill className="object-cover photo-flash" />
-          <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black opacity-60" />
-        </div>
-
-        {/* Top-right: woman at table */}
-        <div
-          className="absolute top-0 right-0 w-[38%] h-[60%] opacity-25"
-          style={{ mixBlendMode: "luminosity" }}
-        >
-          <Image src="/images/img4.jpg" alt="" fill className="object-cover object-top photo-flash" />
-          <div className="absolute inset-0 bg-gradient-to-bl from-transparent to-black opacity-70" />
-        </div>
-
-        {/* Bottom-left: gifts */}
-        <div
-          className="absolute bottom-0 left-0 w-[30%] h-[40%] opacity-20 collage-rotate-2"
-          style={{ mixBlendMode: "luminosity" }}
-        >
-          <Image src="/images/img5.jpg" alt="" fill className="object-cover photo-flash" />
-          <div className="absolute inset-0 bg-gradient-to-tr from-transparent to-black opacity-60" />
-        </div>
-
-        {/* Bottom-right: Christmas decor collage */}
-        <div
-          className="absolute bottom-0 right-0 w-[35%] h-[45%] opacity-20"
-          style={{ mixBlendMode: "luminosity" }}
-        >
-          <Image src="/images/img2.jpg" alt="" fill className="object-cover photo-flash" />
-          <div className="absolute inset-0 bg-gradient-to-tl from-transparent to-black opacity-60" />
-        </div>
-
-        {/* Vignette */}
-        <div className="absolute inset-0 bg-gradient-radial from-transparent via-black/40 to-black/80" />
-        <div className="absolute inset-0" style={{
-          background: "radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,0.7) 100%)"
-        }} />
+    <section id="hero" className="relative overflow-hidden">
+      {/* Фон: глубокий красный бархат с бумажной фактурой */}
+      <div className="absolute inset-0 bg-[#4A060F]" />
+      <div className="absolute inset-0 opacity-[0.38]">
+        <Image
+          src="/images/burgundy-paper.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+          aria-hidden="true"
+        />
       </div>
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(18,2,5,0.62)_100%)]" />
+      <div className="absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-black/45 to-transparent" />
 
-      {/* Scattered decorative notes */}
-      <div className="absolute top-[8%] left-[4%] max-w-[160px] collage-rotate-1 hidden md:block z-10">
-        <div className="cutout-card text-xs leading-relaxed" style={{ fontFamily: "'Dancing Script', cursive", fontSize: "0.8rem" }}>
-          <span className="text-[#8B0000]">Дресс-код:</span><br />
-          то, что хотелось<br />
-          надеть в этом году,<br />
-          но не выдалось<br />
-          случая ♡
-        </div>
-      </div>
+      {/* Подвешенные новогодние шары с фрагментами постера */}
+      {baubles.map((b) => (
+        <Bauble key={b.src} b={b} />
+      ))}
 
-      <div className="absolute top-[10%] right-[5%] max-w-[150px] collage-rotate-3 hidden md:block z-10">
-        <div className="cutout-card text-xs leading-relaxed" style={{ fontFamily: "'Dancing Script', cursive", fontSize: "0.8rem" }}>
-          Новый год —<br />
-          это не только<br />
-          про подарки,<br />
-          но и про нас ♡
-        </div>
-      </div>
+      {/* Центральный блок */}
+      <div className="relative max-w-3xl mx-auto px-6 pt-32 sm:pt-40 pb-20 sm:pb-24 text-center">
+        <ScrollFade>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <span className="stamp-badge">
+              <Sparkles className="w-3 h-3 text-[#C8A86B]" />
+              Private Event · 15 мест
+            </span>
+            <span className="text-xs uppercase tracking-[0.25em] text-[#E2C889]/85 font-mono">
+              Санкт-Петербург · 19 декабря 2026
+            </span>
+          </div>
+        </ScrollFade>
 
-      <div className="absolute bottom-[15%] left-[3%] max-w-[155px] collage-rotate-2 hidden md:block z-10">
-        <div className="cutout-card" style={{ fontFamily: "'Dancing Script', cursive", fontSize: "1rem", lineHeight: 1.4 }}>
-          <em>В этот вечер<br />можно всё.<br />Почти.</em> ♡
-        </div>
-      </div>
+        <ScrollFade delay={100}>
+          <div className="mt-8 space-y-1">
+            <div className="font-display text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-[#FAF7F2] leading-[0.98] drop-shadow-[0_4px_18px_rgba(0,0,0,0.45)]">
+              LAST NIGHT
+              <span className="block font-light text-[#FAF7F2]/85">OF THE YEAR</span>
+            </div>
+            <div className="font-script text-6xl sm:text-8xl md:text-9xl text-[#E2C889] leading-[0.95] pt-3 tracking-[0.04em] drop-shadow-[0_6px_28px_rgba(0,0,0,0.5)]">
+              girls
+            </div>
+          </div>
+        </ScrollFade>
 
-      <div className="absolute bottom-[12%] right-[4%] max-w-[145px] collage-rotate-1 hidden md:block z-10">
-        <div className="cutout-card text-xs leading-relaxed" style={{ fontFamily: "'Dancing Script', cursive", fontSize: "0.78rem" }}>
-          <strong>Что тебя ждёт?</strong><br />
-          • Частная вечеринка<br />
-          • Ролевая игра<br />
-          • Новогодняя атмосфера<br />
-          • Незабываемая ночь
-        </div>
-      </div>
+        <ScrollFade delay={200}>
+          <p className="font-serif text-xl sm:text-2xl text-[#FAF7F2]/85 leading-relaxed max-w-xl mx-auto mt-8">
+            Последняя большая ночь этого года. Только девушки, роскошные образы, тайная
+            ролевая игра, подарки и ледяное шампанское в кругу своих.
+          </p>
+        </ScrollFade>
 
-      {/* Star decorations */}
-      <div className="absolute top-[20%] left-[35%] star-deco text-[#C41E3A] text-2xl z-10">✦</div>
-      <div className="absolute top-[35%] right-[30%] star-deco text-[#C0C0C0] text-lg z-10" style={{animationDelay: "1s"}}>✦</div>
-      <div className="absolute bottom-[25%] left-[45%] star-deco text-[#C41E3A] text-xl z-10" style={{animationDelay: "2s"}}>✦</div>
-      <div className="absolute top-[65%] left-[20%] star-deco text-[#C0C0C0] text-sm z-10" style={{animationDelay: "0.5s"}}>✦</div>
-      <div className="absolute top-[55%] right-[18%] star-deco text-[#C41E3A] text-sm z-10" style={{animationDelay: "1.5s"}}>✦</div>
+        {/* Три ключевых факта */}
+        <ScrollFade delay={300}>
+          <div className="grid sm:grid-cols-3 gap-6 mt-10 pt-7 border-t border-[#E2C889]/25 text-left">
+            <div>
+              <span className="text-[#E2C889] font-mono block text-xs mb-1 uppercase tracking-widest">Дата и время</span>
+              <span className="text-[#FAF7F2] font-display text-base font-semibold block">19 декабря 2026</span>
+              <span className="text-white/50 text-[0.7rem] block mt-0.5">20:00 — 06:00 (суббота)</span>
+            </div>
+            <div>
+              <span className="text-[#E2C889] font-mono block text-xs mb-1 uppercase tracking-widest">Формат</span>
+              <span className="text-[#FAF7F2] font-display text-base font-semibold block">15 участниц</span>
+              <span className="text-white/50 text-[0.7rem] block mt-0.5">Закрытый круг по анкетам</span>
+            </div>
+            <div>
+              <span className="text-[#E2C889] font-mono block text-xs mb-1 uppercase tracking-widest">Стоимость</span>
+              <span className="text-[#E2C889] font-display text-base font-semibold block">3 500 ₽</span>
+              <span className="text-white/50 text-[0.7rem] block mt-0.5">Всё включено: фуршет и напитки</span>
+            </div>
+          </div>
+        </ScrollFade>
 
-      {/* Main content */}
-      <div className="relative z-20 text-center px-6 py-16 max-w-4xl mx-auto">
-        {/* Private Event badge */}
-        <div className="mb-8 inline-flex items-center gap-3">
-          <span className="ornament-divider w-16" />
-          <span
-            className="text-[0.65rem] tracking-[0.35em] uppercase"
-            style={{ color: "#C0C0C0", fontFamily: "'Cormorant Garamond', serif" }}
+        {/* Действия */}
+        <ScrollFade delay={400}>
+          <div className="flex flex-wrap items-center justify-center gap-4 mt-10">
+            <a href="#pass" className="btn-editorial shadow-[0_10px_30px_rgba(0,0,0,0.45)]">
+              <span>Book your spot</span>
+              <ArrowRight className="w-3.5 h-3.5 text-[#E2C889]" />
+            </a>
+            <a href="#lookbook" className="btn-editorial-secondary">
+              <span>Атмосфера вечера</span>
+            </a>
+          </div>
+        </ScrollFade>
+
+        <ScrollFade delay={500}>
+          <button
+            type="button"
+            onClick={() => setIsLightboxOpen(true)}
+            className="inline-flex items-center gap-2 mt-7 text-xs uppercase tracking-[0.2em] text-[#E2C889]/75 hover:text-[#E2C889] font-mono transition-colors cursor-pointer"
           >
-            Private Event · Санкт-Петербург
-          </span>
-          <span className="ornament-divider w-16" />
-        </div>
+            <Maximize2 className="w-3.5 h-3.5" />
+            <span>Официальный арт-постер</span>
+          </button>
+        </ScrollFade>
+      </div>
 
-        {/* Main title */}
-        <h1 className="hero-title mb-0">
-          <span className="block text-[clamp(2.8rem,11vw,8rem)]">LAST NIGHT</span>
-          <span className="block text-[clamp(2.2rem,8.5vw,6rem)]">OF THE YEAR</span>
-        </h1>
+      {/* Lightbox Modal */}
+      {isLightboxOpen && (
         <div
-          className="hero-girls block text-[clamp(4rem,16vw,11rem)] mb-4"
-          style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontStyle: "italic" }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl animate-in fade-in duration-200"
+          onClick={() => setIsLightboxOpen(false)}
         >
-          GIRLS
-        </div>
-
-        {/* Subtitle */}
-        <p
-          className="text-[clamp(0.85rem,2vw,1.05rem)] leading-relaxed mb-10 max-w-lg mx-auto"
-          style={{ color: "rgba(245,240,232,0.7)", fontFamily: "'Cormorant Garamond', serif", fontSize: "clamp(0.9rem, 2.2vw, 1.1rem)" }}
-        >
-          Последняя большая ночь этого года.<br />
-          Только девочки, красивые образы<br />
-          и истории, которые останутся с нами.
-        </p>
-
-        {/* Date / Time row */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 mb-8">
-          <div className="cutout-card text-center" style={{ minWidth: "130px" }}>
-            <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: "1.4rem", color: "#1a1a1a" }}>
-              19 ДЕКАБРЯ
-            </div>
-            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1rem", color: "#444" }}>
-              20:00
-            </div>
-          </div>
-
-          <span style={{ color: "#C41E3A", fontFamily: "'Playfair Display', serif", fontSize: "1.5rem" }}>—</span>
-
-          <div className="cutout-card text-center" style={{ minWidth: "130px" }}>
-            <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: "1.4rem", color: "#1a1a1a" }}>
-              20 ДЕКАБРЯ
-            </div>
-            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1rem", color: "#444" }}>
-              06:00
-            </div>
-          </div>
-        </div>
-
-        {/* Price */}
-        <div className="mb-10">
           <div
-            className="inline-block px-8 py-3"
-            style={{
-              background: "linear-gradient(135deg, #6B0F1A, #8B0000)",
-              border: "1px solid #C41E3A",
-              boxShadow: "0 4px 30px rgba(196,30,58,0.3)"
-            }}
+            className="relative max-w-xl w-full max-h-[92vh] flex flex-col items-center"
+            onClick={(e) => e.stopPropagation()}
           >
-            <span
-              style={{
-                fontFamily: "'Playfair Display', serif",
-                fontWeight: 700,
-                fontSize: "clamp(1.4rem, 4vw, 2rem)",
-                color: "#F5F0E8",
-                letterSpacing: "0.05em"
-              }}
+            <button
+              onClick={() => setIsLightboxOpen(false)}
+              className="absolute -top-12 right-0 text-white/70 hover:text-white p-2"
+              aria-label="Закрыть"
             >
-              3 500 ₽
-            </span>
-            <span
-              style={{
-                display: "block",
-                fontFamily: "'Cormorant Garamond', serif",
-                fontSize: "0.75rem",
-                color: "rgba(245,240,232,0.7)",
-                letterSpacing: "0.2em",
-                textTransform: "uppercase"
-              }}
-            >
-              билет на вечеринку
-            </span>
+              <X className="w-7 h-7" />
+            </button>
+            <div className="relative w-full aspect-[2/3] max-h-[85vh] rounded-2xl overflow-hidden border-2 border-[#C8A86B]/40 shadow-2xl">
+              <Image
+                src="/images/poster.jpg"
+                alt="Last Night of the Year Girls Poster"
+                fill
+                className="object-contain"
+              />
+            </div>
           </div>
         </div>
-
-        {/* CTA */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a href="#registration" className="cta-button">
-            <span>ПОДАТЬ ЗАЯВКУ</span>
-          </a>
-          <a
-            href="#info"
-            className="text-[0.75rem] tracking-[0.2em] uppercase underline underline-offset-4"
-            style={{ color: "rgba(245,240,232,0.5)", fontFamily: "'Cormorant Garamond', serif" }}
-          >
-            Подробнее
-          </a>
-        </div>
-
-        {/* 18+ badge */}
-        <div className="mt-8 text-[#C0C0C0] text-xs tracking-widest opacity-60">18+</div>
-      </div>
-
-      {/* Bottom gradient fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#080808] to-transparent" />
+      )}
     </section>
   );
 }

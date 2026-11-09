@@ -1,8 +1,13 @@
 // Telegram Bot utilities for LAST NIGHT OF THE YEAR GIRLS
+// Примечание: api.telegram.org может быть недоступен без VPN.
+// Все отправки — с таймаутом и без проброса ошибок наружу,
+// чтобы недоступность Telegram никогда не ломала заявки.
+// Если есть прокси/зеркало бот-API, задайте TELEGRAM_API_BASE в .env.
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!;
 const ORGANIZER_CHAT_ID = process.env.ORGANIZER_CHAT_ID!;
-const BASE_URL = `https://api.telegram.org/bot${BOT_TOKEN}`;
+const API_BASE = process.env.TELEGRAM_API_BASE || "https://api.telegram.org";
+const BASE_URL = `${API_BASE.replace(/\/$/, "")}/bot${BOT_TOKEN}`;
 
 async function sendMessage(chatId: string | number, text: string, parseMode = "HTML") {
   try {
@@ -14,6 +19,7 @@ async function sendMessage(chatId: string | number, text: string, parseMode = "H
         text,
         parse_mode: parseMode,
       }),
+      signal: AbortSignal.timeout(6000),
     });
     const data = await res.json();
     if (!data.ok) {

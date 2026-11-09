@@ -1,78 +1,43 @@
 "use client";
+import { ArrowRight } from "lucide-react";
 import ScrollFade from "./ScrollFade";
-import BowSVG from "./BowSVG";
 
 export default function FinalSection() {
   return (
-    <section
-      className="relative py-32 overflow-hidden text-center"
-      style={{
-        background: "linear-gradient(180deg, #0a0a0a 0%, #0f0205 40%, #160208 100%)"
-      }}
-    >
-      {/* Stars */}
-      <div className="absolute top-[10%] left-[10%] star-deco text-[#C41E3A] text-3xl">✦</div>
-      <div className="absolute top-[15%] right-[12%] star-deco text-[#C0C0C0] text-xl" style={{animationDelay:"1s"}}>✦</div>
-      <div className="absolute bottom-[20%] left-[15%] star-deco text-[#C0C0C0] text-lg" style={{animationDelay:"0.5s"}}>✦</div>
-      <div className="absolute bottom-[25%] right-[8%] star-deco text-[#C41E3A] text-2xl" style={{animationDelay:"1.5s"}}>✦</div>
-      <div className="absolute top-[50%] left-[5%] star-deco text-[#C41E3A] text-sm" style={{animationDelay:"2s"}}>✦</div>
-      <div className="absolute top-[40%] right-[5%] star-deco text-[#C0C0C0] text-sm" style={{animationDelay:"0.8s"}}>✦</div>
+    <section className="py-28 sm:py-36 px-6 max-w-4xl mx-auto border-t border-[#C8A86B]/20 text-center">
+      <ScrollFade>
+        <div className="flex items-center justify-center gap-2 text-xs uppercase tracking-[0.25em] text-[#C8A86B] font-mono mb-6">
+          <span>✦</span>
+          <span>19 декабря 2026 · Санкт-Петербург</span>
+          <span>✦</span>
+        </div>
 
-      <div className="relative z-10 max-w-3xl mx-auto px-6">
-        <ScrollFade>
-          <BowSVG className="w-20 h-16 mx-auto mb-8" color="#C41E3A" />
+        <h2 className="font-display text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-[#FAF7F2] mb-6 leading-tight">
+          Твоя история этой ночью
+          <span className="block font-brush text-[#C8A86B] text-6xl sm:text-8xl md:text-9xl mt-2 drop-shadow-md">
+            только начинается
+          </span>
+        </h2>
 
-          <h2
-            style={{
-              fontFamily: "'Playfair Display', serif",
-              fontWeight: 900,
-              fontStyle: "italic",
-              fontSize: "clamp(1.8rem, 6vw, 3.5rem)",
-              color: "#F5F0E8",
-              lineHeight: 1.2,
-              marginBottom: "1.5rem"
-            }}
-          >
-            Твоя история этой ночью
-            <br />
-            <span style={{ color: "#C41E3A" }}>только начинается</span>
-          </h2>
+        <p className="font-serif text-xl sm:text-2xl text-[#FAF7F2]/75 max-w-xl mx-auto leading-relaxed mb-10">
+          15 девушек. Бокалы с пузырьками. Музыка, тайны и ночь, которую ты будешь с нежностью вспоминать весь следующий год.
+        </p>
 
-          <div className="ornament-divider mx-auto max-w-xs mb-8">
-            <span style={{ color: "#C41E3A", fontSize: "1.2rem" }}>✦</span>
-          </div>
-
-          <p
-            style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: "clamp(1rem, 2.5vw, 1.25rem)",
-              color: "rgba(245,240,232,0.65)",
-              lineHeight: 1.8,
-              marginBottom: "2.5rem"
-            }}
-          >
-            19 декабря 2026. Санкт-Петербург.<br />
-            Закрытая девичья вечеринка.<br />
-            Только 15 мест.
-          </p>
-
-          <a href="#registration" className="cta-button">
-            <span>ПОДАТЬ ЗАЯВКУ</span>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a href="#pass" className="btn-editorial text-center">
+            <span>Забронировать место&nbsp;<span className="whitespace-nowrap">(3 500 ₽)</span></span>
+            <ArrowRight className="w-3.5 h-3.5 text-[#E2C889] shrink-0" />
           </a>
 
-          <div className="mt-16 pt-8" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-            <p
-              style={{
-                fontFamily: "'Dancing Script', cursive",
-                fontSize: "0.9rem",
-                color: "rgba(245,240,232,0.3)"
-              }}
-            >
-              LAST NIGHT OF THE YEAR GIRLS · Private Event · Санкт-Петербург · 18+
-            </p>
-          </div>
-        </ScrollFade>
-      </div>
+          <a href="#hero" className="btn-editorial-secondary">
+            <span>В начало</span>
+          </a>
+        </div>
+
+        <div className="text-xs text-white/40 tracking-widest uppercase mt-12 font-mono">
+          Только 15 мест · 18+ · Закрытый отбор по анкетам
+        </div>
+      </ScrollFade>
     </section>
   );
 }

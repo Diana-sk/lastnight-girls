@@ -1,129 +1,82 @@
 "use client";
 import Image from "next/image";
 import ScrollFade from "./ScrollFade";
-import BowSVG from "./BowSVG";
 
 export default function DressCodeSection() {
+  const styles = [
+    {
+      title: "Dark Velvet & Corsetry",
+      desc: "Бархат глубоких винных и тёмно-красных оттенков, шёлк, атлас, корсеты и струящиеся силуэты.",
+    },
+    {
+      title: "Holiday Sparkle & Shine",
+      desc: "Всё, что сияет в свете свечей: пайетки, металлик, мерцающие ткани и роскошный праздничный блеск.",
+    },
+    {
+      title: "Vintage Chic & Accessories",
+      desc: "Жемчужные нити, оперные перчатки, атласные банты, акцентные туфли и украшения с историей.",
+    },
+  ];
+
   return (
-    <section
-      id="dresscode"
-      className="relative py-24 overflow-hidden"
-      style={{ background: "linear-gradient(180deg, #0a0a0a 0%, #0d0205 100%)" }}
-    >
-      <div className="max-w-5xl mx-auto px-6">
-        <div className="grid md:grid-cols-5 gap-10 items-center">
+    <section id="manifesto" className="relative py-28 sm:py-36 px-6 overflow-hidden border-t border-[#C8A86B]/20">
+      {/* Subtle crumpled burgundy paper texture in background */}
+      <div className="absolute inset-0 opacity-15 pointer-events-none">
+        <Image
+          src="/images/burgundy-paper.jpg"
+          alt=""
+          fill
+          className="object-cover"
+        />
+      </div>
 
-          {/* Left: text (3 cols) */}
-          <div className="md:col-span-3 space-y-8">
-            <ScrollFade>
-              <div className="flex items-center gap-3 mb-2">
-                <BowSVG className="w-12 h-9" color="#C41E3A" />
-                <span
-                  style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: "0.75rem",
-                    letterSpacing: "0.3em",
-                    color: "#C41E3A",
-                    textTransform: "uppercase"
-                  }}
-                >
-                  Дресс-код вечера
-                </span>
-              </div>
+      <div className="relative z-10 max-w-4xl mx-auto text-center space-y-10">
+        <ScrollFade>
+          <div className="inline-flex items-center gap-2">
+            <span className="stamp-badge">
+              Дресс-код мероприятия
+            </span>
+          </div>
+        </ScrollFade>
 
-              <h2
-                style={{
-                  fontFamily: "'Playfair Display', serif",
-                  fontWeight: 700,
-                  fontStyle: "italic",
-                  fontSize: "clamp(1.8rem, 5vw, 3rem)",
-                  color: "#F5F0E8",
-                  lineHeight: 1.2
-                }}
-              >
-                «То, что хотелось надеть<br />в этом году,<br />но не выдалось случая»
-              </h2>
-            </ScrollFade>
+        <ScrollFade delay={100}>
+          <h2 className="font-serif italic text-3xl sm:text-5xl md:text-6xl font-normal text-[#FAF7F2] leading-[1.15]">
+            «То, что хотелось надеть в этом году, но не выдалось случая»
+          </h2>
+        </ScrollFade>
 
-            <ScrollFade>
-              <p
-                style={{
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontSize: "clamp(1rem, 2vw, 1.2rem)",
-                  lineHeight: 1.8,
-                  color: "rgba(245,240,232,0.75)"
-                }}
-              >
-                Никаких строгих рамок. Наряди себя так, как давно хотела. То платье из магазина, которое так и не дождалось своего выхода. Образ, который казался слишком смелым для обычного вечера.
-              </p>
+        <ScrollFade delay={200}>
+          <p className="font-serif text-xl sm:text-2xl text-[#FAF7F2]/80 max-w-2xl mx-auto leading-relaxed">
+            Главный закон ночи: никаких скучных рамок. Достань то самое платье, в котором ты чувствуешь себя ослепительно: бархат винных оттенков, корсеты, струящийся шёлк, сверкающие пайетки, оперные перчатки или любимые туфли на каблуке.
+          </p>
+        </ScrollFade>
 
-              <p
-                className="mt-4"
-                style={{
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontSize: "clamp(1rem, 2vw, 1.2rem)",
-                  lineHeight: 1.8,
-                  color: "rgba(245,240,232,0.75)"
-                }}
-              >
-                Эта ночь — твой шанс.
-              </p>
-            </ScrollFade>
-
-            <ScrollFade>
-              {/* Handwritten note */}
+        {/* 3 Directions as Editorial Notes */}
+        <ScrollFade delay={300}>
+          <div className="grid md:grid-cols-3 gap-6 pt-4 text-left">
+            {styles.map((item, idx) => (
               <div
-                className="cutout-card max-w-sm collage-rotate-2"
-                style={{
-                  fontFamily: "'Dancing Script', cursive",
-                  fontSize: "1.1rem",
-                  lineHeight: 1.6,
-                  borderLeft: "3px solid #8B0000"
-                }}
+                key={idx}
+                className="p-6 rounded-2xl border border-[#C8A86B]/25 bg-[#140F11]/80 backdrop-blur-sm"
               >
-                <p>Приходи такой, какой<br />хочешь себя видеть<br />в последнюю ночь года ♡</p>
+                <div className="text-xs font-mono text-[#C8A86B] mb-2">0{idx + 1}</div>
+                <div className="font-display text-lg font-bold text-[#FAF7F2] mb-1.5">{item.title}</div>
+                <div className="font-serif text-sm text-[#FAF7F2]/70 leading-relaxed">{item.desc}</div>
               </div>
-            </ScrollFade>
+            ))}
           </div>
+        </ScrollFade>
 
-          {/* Right: image (2 cols) */}
-          <div className="md:col-span-2">
-            <ScrollFade>
-              <div className="relative">
-                {/* Main image */}
-                <div
-                  className="relative h-[420px] overflow-hidden collage-rotate-1"
-                  style={{ boxShadow: "12px 12px 40px rgba(0,0,0,0.8)" }}
-                >
-                  <Image
-                    src="/images/img4.jpg"
-                    alt="Дресс-код"
-                    fill
-                    className="object-cover object-top photo-flash"
-                  />
-                  {/* Red overlay tint */}
-                  <div
-                    className="absolute inset-0"
-                    style={{ background: "linear-gradient(to top, rgba(107,15,26,0.3) 0%, transparent 60%)" }}
-                  />
-                </div>
-
-                {/* 18+ badge */}
-                <div
-                  className="absolute -top-4 -right-4 w-14 h-14 rounded-full flex items-center justify-center z-10"
-                  style={{ background: "#C41E3A", fontFamily: "'Playfair Display', serif", fontWeight: 900, color: "#F5F0E8" }}
-                >
-                  18+
-                </div>
-
-                {/* Small bow */}
-                <div className="absolute -bottom-4 -left-4 z-10">
-                  <BowSVG className="w-12 h-9" color="#8B0000" />
-                </div>
-              </div>
-            </ScrollFade>
+        <ScrollFade delay={400}>
+          <div className="pt-6">
+            <span className="font-brush text-3xl sm:text-4xl text-[#C8A86B] drop-shadow-md inline-block">
+              «В этот вечер можно всё. Почти.»
+            </span>
+            <p className="text-xs text-white/45 tracking-widest uppercase mt-3">
+              Если сомневаешься в деталях — организатор с радостью поможет определиться с образом
+            </p>
           </div>
-        </div>
+        </ScrollFade>
       </div>
     </section>
   );

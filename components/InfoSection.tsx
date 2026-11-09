@@ -1,100 +1,50 @@
 "use client";
 import ScrollFade from "./ScrollFade";
-import BowSVG from "./BowSVG";
 
 export default function InfoSection() {
-  const details = [
-    { label: "Дата", value: "19 декабря 2026", sub: "пятница" },
-    { label: "Время", value: "20:00 — 06:00", sub: "до утра" },
-    { label: "Место", value: "Санкт-Петербург", sub: "адрес — за 2 недели до мероприятия" },
-    { label: "Стоимость", value: "3 500 ₽", sub: "один билет" },
-    { label: "Возраст", value: "18+", sub: "только совершеннолетние" },
-    { label: "Участниц", value: "до 15", sub: "закрытый формат" },
+  const specs = [
+    { label: "Дата проведения", value: "19 декабря 2026", note: "Суббота, последний уикенд перед предновогодней суетой" },
+    { label: "Время", value: "20:00 — 06:00", note: "10 часов насыщенной программы и общения до утра" },
+    { label: "Локация", value: "Санкт-Петербург, центр", note: "Точный адрес красивых апартаментов направляется за 14 дней" },
+    { label: "Стоимость участия", value: "3 500 ₽", note: "Всё включено: игристое, фуршет, ролевая игра, подарки", highlight: true },
+    { label: "Количество гостей", value: "До 15 девушек", note: "Камерный закрытый круг, отбор по персональным анкетам" },
+    { label: "Возрастной ценз", value: "18+", note: "Мероприятие только для совершеннолетних участниц" },
   ];
 
   return (
-    <section
-      id="info"
-      className="relative py-24 overflow-hidden"
-      style={{ background: "linear-gradient(180deg, #080808 0%, #0a0205 100%)" }}
-    >
-      <div className="max-w-5xl mx-auto px-6">
+    <section id="details" className="py-24 px-6 max-w-5xl mx-auto border-t border-[#C8A86B]/20">
+      <div className="max-w-2xl mb-16">
         <ScrollFade>
-          <div className="text-center mb-16">
-            <BowSVG className="w-16 h-12 mx-auto mb-4" color="#8B0000" />
-            <h2
-              style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: "clamp(2rem, 6vw, 3.5rem)", color: "#F5F0E8" }}
-            >
-              Информация
-            </h2>
-            <div className="ornament-divider mx-auto max-w-xs mt-4">
-              <span style={{ color: "#C41E3A", fontSize: "1.2rem" }}>✦</span>
-            </div>
+          <div className="flex items-center gap-3 mb-3">
+            <span className="stamp-badge">Параметры вечера</span>
+            <span className="font-script text-[#C8A86B] text-2xl">specifications</span>
           </div>
+          <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#FAF7F2] mb-4">
+            Детали мероприятия
+          </h2>
+          <p className="font-serif text-xl text-[#FAF7F2]/75 leading-relaxed">
+            Прозрачные условия и ключевые организационные параметры вечеринки.
+          </p>
         </ScrollFade>
+      </div>
 
-        {/* Details grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px" style={{ border: "1px solid rgba(255,255,255,0.06)", background: "rgba(255,255,255,0.06)" }}>
-          {details.map((d) => (
-            <ScrollFade key={d.label}>
-              <div
-                className="text-center py-10 px-6"
-                style={{ background: "#080808" }}
-              >
-                <div
-                  style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: "0.75rem",
-                    letterSpacing: "0.3em",
-                    textTransform: "uppercase",
-                    color: "#C41E3A",
-                    marginBottom: "0.75rem"
-                  }}
-                >
-                  {d.label}
-                </div>
-                <div
-                  style={{
-                    fontFamily: "'Playfair Display', serif",
-                    fontWeight: 700,
-                    fontSize: "clamp(1.2rem, 3vw, 1.6rem)",
-                    color: "#F5F0E8",
-                    marginBottom: "0.4rem"
-                  }}
-                >
-                  {d.value}
-                </div>
-                <div
-                  style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: "0.85rem",
-                    color: "rgba(245,240,232,0.45)"
-                  }}
-                >
-                  {d.sub}
-                </div>
+      {/* Specifications Table */}
+      <div className="divide-y divide-[#C8A86B]/20 border-y border-[#C8A86B]/20">
+        {specs.map((item, idx) => (
+          <ScrollFade key={idx} delay={idx * 50}>
+            <div className="py-6 sm:py-7 grid sm:grid-cols-12 gap-3 items-baseline">
+              <div className="sm:col-span-4 text-xs uppercase tracking-widest text-[#C8A86B] font-mono">
+                {item.label}
               </div>
-            </ScrollFade>
-          ))}
-        </div>
-
-        {/* Note about address */}
-        <ScrollFade>
-          <div className="text-center mt-10">
-            <div
-              className="inline-block"
-              style={{
-                fontFamily: "'Dancing Script', cursive",
-                fontSize: "0.95rem",
-                color: "rgba(245,240,232,0.5)",
-                borderTop: "1px solid rgba(255,255,255,0.08)",
-                paddingTop: "1.5rem"
-              }}
-            >
-              ✦ Точный адрес приходит участницам за 2 недели до мероприятия ✦
+              <div className={`sm:col-span-4 font-display text-xl sm:text-2xl font-bold ${item.highlight ? "text-[#E2C889]" : "text-[#FAF7F2]"}`}>
+                {item.value}
+              </div>
+              <div className="sm:col-span-4 text-xs sm:text-sm text-[#FAF7F2]/65 font-serif">
+                {item.note}
+              </div>
             </div>
-          </div>
-        </ScrollFade>
+          </ScrollFade>
+        ))}
       </div>
     </section>
   );
