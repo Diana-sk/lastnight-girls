@@ -5,16 +5,16 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_ADMIN_URL || "https://lastnight-girls.ru"),
   title: "LAST NIGHT OF THE YEAR GIRLS · Закрытая новогодняя вечеринка в Санкт-Петербурге",
   description:
-    "Последняя большая ночь этого года. Только девушки, роскошные образы, ролевая игра, подарок от организатора и шампанское. 19 декабря 2026, Санкт-Петербург.",
+    "Последняя большая ночь этого года. Только девушки, роскошные образы, ролевая игра, подарок от организатора и шампанское. 19–20 декабря 2026, Санкт-Петербург.",
   openGraph: {
     title: "LAST NIGHT OF THE YEAR GIRLS",
-    description: "Закрытый девичник · 19 декабря 2026 · Санкт-Петербург · 15 мест",
+    description: "Закрытый девичник · 19–20 декабря 2026 · Санкт-Петербург · 15 мест",
     type: "website",
     images: [
       {
         url: "/images/poster.jpg",
-        width: 682,
-        height: 1024,
+        width: 1024,
+        height: 1536,
         alt: "Last Night of the Year Girls Poster",
       },
     ],

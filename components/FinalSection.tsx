@@ -8,7 +8,7 @@ export default function FinalSection() {
       <ScrollFade>
         <div className="flex items-center justify-center gap-2 text-xs uppercase tracking-[0.25em] text-[#C8A86B] font-mono mb-6">
           <span>✦</span>
-          <span>19 декабря 2026 · Санкт-Петербург</span>
+          <span>19–20 декабря 2026 · Санкт-Петербург</span>
           <span>✦</span>
         </div>
 

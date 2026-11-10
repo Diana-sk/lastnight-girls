@@ -13,6 +13,7 @@ interface FormData {
   wishes: string;
   allergies: string;
   foodWishes: string;
+  secretChapter: string;
   agreeRules: boolean;
   agreePrivacy: boolean;
 }
@@ -25,6 +26,7 @@ const initialData: FormData = {
   wishes: "",
   allergies: "",
   foodWishes: "",
+  secretChapter: "",
   agreeRules: false,
   agreePrivacy: false,
 };
@@ -793,6 +795,38 @@ export default function RegistrationSection() {
                           placeholder="Орехи, лактоза, цитрусовые..."
                           className="cream-input"
                         />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="block text-xs uppercase tracking-wider text-[#1A1516]/75 font-semibold">
+                          Останешься на секретную главу (00:00–06:00)?
+                        </label>
+                        <div className="flex flex-wrap gap-2.5">
+                          {[
+                            { value: "yes", label: "Да" },
+                            { value: "no", label: "Нет" },
+                            { value: "unsure", label: "Затрудняюсь ответить" },
+                          ].map((opt) => (
+                            <label
+                              key={opt.value}
+                              className={`px-4 py-2 rounded-full border text-sm cursor-pointer transition-all ${
+                                form.secretChapter === opt.value
+                                  ? "border-[#750D1E] bg-[#750D1E] text-[#FAF7F2]"
+                                  : "border-[#750D1E]/25 bg-white text-[#1A1516]/80 hover:border-[#750D1E]/50"
+                              }`}
+                            >
+                              <input
+                                type="radio"
+                                name="secretChapter"
+                                value={opt.value}
+                                checked={form.secretChapter === opt.value}
+                                onChange={handleChange}
+                                className="sr-only"
+                              />
+                              {opt.label}
+                            </label>
+                          ))}
+                        </div>
                       </div>
 
                       <div className="space-y-1.5">

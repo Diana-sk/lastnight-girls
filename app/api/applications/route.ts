@@ -69,7 +69,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, age, telegram, contact, wishes, allergies, foodWishes, agreeRules, agreePrivacy } = body;
+    const { name, age, telegram, contact, wishes, allergies, foodWishes, secretChapter, agreeRules, agreePrivacy } = body;
 
     // Validation
     if (!name || !age || !telegram || !contact) {
@@ -132,6 +132,7 @@ export async function POST(req: NextRequest) {
           wishes: wishes?.trim() || null,
           allergies: allergies?.trim() || null,
           foodWishes: foodWishes?.trim() || null,
+          secretChapter: ["yes", "no", "unsure"].includes(secretChapter) ? secretChapter : null,
           status: isFull ? "WAITLIST" : "NEW",
           isWaitlist: isFull,
         },
@@ -148,6 +149,7 @@ export async function POST(req: NextRequest) {
       wishes: application.wishes,
       allergies: application.allergies,
       foodWishes: application.foodWishes,
+      secretChapter: application.secretChapter,
     }).catch((err) => console.error("Telegram notify failed:", err));
 
     return NextResponse.json({

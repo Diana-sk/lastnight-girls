@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { notifyOrganizerReservationExpired } from "@/lib/telegram";
+import { expireReservations } from "@/lib/expire";
 
-// Проверка истёкших резервов. Вызывается Vercel Cron (см. vercel.json)
-// каждый час. Vercel автоматически шлёт заголовок Authorization: Bearer $CRON_SECRET.
+// Ежедневная проверка истёкших резервов (09:13 по UTC — см. vercel.json;
+// на Hobby-плане Vercel cron чаще раза в день запускать нельзя).
+// Дополнительно та же проверка запускается при открытии админ-панели.
+// Vercel автоматически шлёт заголовок Authorization: Bearer $CRON_SECRET.
 export const maxDuration = 60;
 
 export async function GET(req: NextRequest) {
@@ -17,36 +18,8 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const now = new Date();
-
-    const expired = await prisma.application.findMany({
-      where: {
-        status: { in: ["APPROVED", "PAYMENT_PENDING"] },
-        reservedUntil: { not: null, lt: now },
-        expiryNotifiedAt: null,
-      },
-    });
-
-    let notified = 0;
-    for (const app of expired) {
-      await prisma.application.update({
-        where: { id: app.id },
-        data: {
-          status: "EXPIRED",
-          reservedUntil: null,
-          expiryNotifiedAt: now,
-        },
-      });
-
-      await notifyOrganizerReservationExpired({
-        applicationId: app.applicationId,
-        name: app.name,
-        telegram: app.telegram,
-      });
-      notified++;
-    }
-
-    return NextResponse.json({ checked: expired.length, notified });
+    const result = await expireReservations();
+    return NextResponse.json(result);
   } catch (err) {
     console.error("Cron expire-reservations error:", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });

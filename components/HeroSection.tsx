@@ -89,7 +89,7 @@ export default function HeroSection() {
               Private Event · 15 мест
             </span>
             <span className="text-xs uppercase tracking-[0.25em] text-[#E2C889]/85 font-mono">
-              Санкт-Петербург · 19 декабря 2026
+              Санкт-Петербург · 19–20 декабря 2026
             </span>
           </div>
         </ScrollFade>
@@ -118,8 +118,8 @@ export default function HeroSection() {
           <div className="grid sm:grid-cols-3 gap-6 mt-10 pt-7 border-t border-[#E2C889]/25 text-left">
             <div>
               <span className="text-[#E2C889] font-mono block text-xs mb-1 uppercase tracking-widest">Дата и время</span>
-              <span className="text-[#FAF7F2] font-display text-base font-semibold block">19 декабря 2026</span>
-              <span className="text-white/50 text-[0.7rem] block mt-0.5">20:00 — 06:00 (суббота)</span>
+              <span className="text-[#FAF7F2] font-display text-base font-semibold block">19–20 декабря 2026</span>
+              <span className="text-white/50 text-[0.7rem] block mt-0.5">20:00 — 00:00 · secret chapter до 06:00</span>
             </div>
             <div>
               <span className="text-[#E2C889] font-mono block text-xs mb-1 uppercase tracking-widest">Формат</span>

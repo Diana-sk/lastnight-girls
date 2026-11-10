@@ -10,7 +10,7 @@ export default function Footer() {
             <span className="font-script text-[#C8A86B] text-xl font-normal lowercase">girls</span>
           </div>
           <div className="text-xs text-white/45 mt-1 font-serif">
-            Закрытая новогодняя вечеринка · 19 декабря 2026 · Санкт-Петербург
+            Закрытая новогодняя вечеринка · 19–20 декабря 2026 · Санкт-Петербург
           </div>
         </div>
 

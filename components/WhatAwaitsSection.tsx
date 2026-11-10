@@ -5,39 +5,45 @@ import ScrollFade from "./ScrollFade";
 const schedule = [
   {
     time: "20:00",
-    title: "Сбор гостей",
-    desc: "Welcome-drink, игристое и первые объятия.",
-    tag: "Приветствие",
+    title: "Welcome Party",
+    desc: "Игристое, музыка, фото и первые знакомства.",
+    tag: "Встреча",
   },
   {
     time: "20:30",
-    title: "Знакомство гостей",
-    desc: "Уютный круг и конверты с секретными ролями.",
-    tag: "Погружение",
+    title: "Let's Get Acquainted",
+    desc: "Игра «Найди своего человека».",
+    tag: "Знакомство",
   },
   {
     time: "21:00",
-    title: "Ролевая игра",
-    desc: "Сюжет с тайнами — каждая станет героиней.",
+    title: "The Roleplay Game",
+    desc: "Главная ролевая вечера: сюжет, тайны, повороты.",
     tag: "Интрига",
   },
   {
-    time: "22:30",
-    title: "Новогодний стол",
-    desc: "Авторский фуршет, тосты и звон бокалов.",
-    tag: "Ужин",
+    time: "22:15",
+    title: "Midnight Feast",
+    desc: "Свободный фуршет, закуски и звон бокалов.",
+    tag: "Фуршет",
   },
   {
-    time: "23:30",
-    title: "Настолки",
-    desc: "Весёлые игры и азарт в кругу своих.",
-    tag: "Игры",
+    time: "22:45",
+    title: "New Year Challenge",
+    desc: "Квиз, задания и предсказания в командах.",
+    tag: "Игра",
   },
   {
-    time: "00:30",
-    title: "Новогодние фильмы",
-    desc: "Пледы, гирлянды и кино до рассвета.",
-    tag: "Уют",
+    time: "23:15",
+    title: "Party Time",
+    desc: "Танцы, настолки и тосты до полуночи.",
+    tag: "Праздник",
+  },
+  {
+    time: "00:00",
+    title: "The Night Divides",
+    desc: "Основная программа завершена. Для тех, кто останется — Secret Chapter.",
+    tag: "Секретная глава",
   },
 ];
 
@@ -174,7 +180,7 @@ export default function WhatAwaitsSection() {
                   ))}
                   <div className="pt-[3%] text-center">
                     <span className="font-script text-[#C8A86B] text-[clamp(14px,2.4vw,22px)]">
-                      до рассвета ✦
+                      secret after hours ✦
                     </span>
                   </div>
                 </div>

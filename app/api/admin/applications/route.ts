@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { expireReservations } from "@/lib/expire";
 import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
@@ -43,6 +44,11 @@ export function unauthorized() {
 // GET all applications with filters
 export async function GET(req: NextRequest) {
   if (!verifyAdminToken(req)) return unauthorized();
+
+  // Фоном помечаем истёкшие резервы — админ сразу видит актуальные статусы
+  void withDbRetry(() => expireReservations()).catch((err) =>
+    console.error("expireReservations on dashboard:", err)
+  );
 
   const { searchParams } = new URL(req.url);
   const status = searchParams.get("status");
