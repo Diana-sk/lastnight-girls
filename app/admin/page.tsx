@@ -46,9 +46,8 @@ export default function AdminLoginPage() {
         style={{
           background: "#161616",
           border: "1px solid #2a2a2a",
-          padding: "3rem 2.5rem",
-          width: "100%",
-          maxWidth: "380px",
+          padding: "clamp(1.5rem, 5vw, 3rem) clamp(1.25rem, 5vw, 2.5rem)",
+          width: "min(380px, calc(100% - 2rem))",
           textAlign: "center"
         }}
       >
@@ -81,12 +80,13 @@ export default function AdminLoginPage() {
           <input
             type="text"
             placeholder="Логин"
+            autoComplete="username"
+            className="border border-[#333] transition-colors focus:border-[#C9A96E]"
             value={login}
             onChange={(e) => setLogin(e.target.value)}
             required
             style={{
               background: "#1a1a1a",
-              border: "1px solid #333",
               color: "#F5F0E8",
               padding: "0.75rem 1rem",
               fontSize: "0.9rem",
@@ -98,12 +98,13 @@ export default function AdminLoginPage() {
           <input
             type="password"
             placeholder="Пароль"
+            autoComplete="current-password"
+            className="border border-[#333] transition-colors focus:border-[#C9A96E]"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
             style={{
               background: "#1a1a1a",
-              border: "1px solid #333",
               color: "#F5F0E8",
               padding: "0.75rem 1rem",
               fontSize: "0.9rem",
@@ -114,7 +115,7 @@ export default function AdminLoginPage() {
           />
 
           {error && (
-            <div style={{
+            <div role="alert" style={{
               background: "rgba(180,30,30,0.15)",
               border: "1px solid rgba(196,30,58,0.3)",
               color: "#F5F0E8",

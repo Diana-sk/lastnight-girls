@@ -1,6 +1,17 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import {
+  X,
+  Check,
+  Clock,
+  LogOut,
+  RefreshCw,
+  CreditCard,
+  RotateCcw,
+  Ban,
+  Save,
+} from "lucide-react";
 
 type ApplicationStatus =
   | "NEW" | "UNDER_REVIEW" | "APPROVED" | "REJECTED"
@@ -54,6 +65,15 @@ const ALL_STATUSES: ApplicationStatus[] = [
   "REFUND_PENDING", "REFUNDED", "WAITLIST", "EXPIRED"
 ];
 
+const actionBtn =
+  "flex min-h-[44px] w-full items-center justify-center gap-2 border px-4 py-2.5 text-sm transition-opacity duration-200 disabled:cursor-not-allowed disabled:opacity-50 font-['Inter',sans-serif]";
+
+const fieldLabel =
+  "mb-1 text-[0.68rem] uppercase tracking-[0.15em] text-[#666]";
+
+const inputStyle =
+  "w-full min-w-0 border border-[#333] bg-[#1a1a1a] px-3 py-2.5 text-sm text-[#F5F0E8] outline-none transition-colors duration-200 placeholder:text-[#555] focus:border-[#C9A96E] font-['Inter',sans-serif]";
+
 export default function AdminDashboard() {
   const router = useRouter();
   const [applications, setApplications] = useState<Application[]>([]);
@@ -69,7 +89,7 @@ export default function AdminDashboard() {
   const [actionLoading, setActionLoading] = useState(false);
   const [notes, setNotes] = useState("");
   const [chatId, setChatId] = useState("");
-  const [actionMsg, setActionMsg] = useState("");
+  const [actionMsg, setActionMsg] = useState<{ text: string; ok: boolean } | null>(null);
 
   const fetchApplications = async () => {
     setLoading(true);
@@ -95,9 +115,18 @@ export default function AdminDashboard() {
 
   useEffect(() => { fetchApplications(); }, [filterStatus, search]);
 
+  // Esc закрывает карточку заявки (актуально на мобильных, где это оверлей)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelectedApp(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   const handleAction = async (appId: string, action: string) => {
     setActionLoading(true);
-    setActionMsg("");
+    setActionMsg(null);
     try {
       const res = await fetch(`/api/admin/applications/${appId}`, {
         method: "PATCH",
@@ -106,16 +135,16 @@ export default function AdminDashboard() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setActionMsg("❌ " + (data.error || "Ошибка"));
+        setActionMsg({ text: data.error || "Ошибка", ok: false });
       } else {
-        setActionMsg("✅ Выполнено");
+        setActionMsg({ text: "Выполнено", ok: true });
         if (selectedApp) {
           setSelectedApp(data.application ? { ...selectedApp, ...data.application } : null);
         }
         fetchApplications();
       }
     } catch {
-      setActionMsg("❌ Ошибка соединения");
+      setActionMsg({ text: "Ошибка соединения", ok: false });
     }
     setActionLoading(false);
   };
@@ -123,6 +152,13 @@ export default function AdminDashboard() {
   const handleLogout = async () => {
     await fetch("/api/admin/login", { method: "DELETE" });
     router.push("/admin");
+  };
+
+  const openApp = (app: Application) => {
+    setSelectedApp(app);
+    setNotes(app.adminNotes || "");
+    setChatId(app.participantChatId || "");
+    setActionMsg(null);
   };
 
   const timeLeft = (reservedUntil: string | null) => {
@@ -134,191 +170,155 @@ export default function AdminDashboard() {
     return `${h}ч ${m}м`;
   };
 
+  const filterBtnClass = (active: boolean) =>
+    [
+      "shrink-0 whitespace-nowrap border px-4 py-2.5 text-sm transition-colors duration-200 lg:w-full lg:rounded-none lg:py-2 lg:text-left",
+      active
+        ? "border-[rgba(196,30,58,0.4)] bg-[rgba(196,30,58,0.15)] text-[#F5F0E8]"
+        : "border-transparent text-[#777] hover:text-[#F5F0E8] lg:hover:bg-[#1e1e1e]",
+    ].join(" ");
+
   return (
-    <div style={{ minHeight: "100vh", background: "#0f0f0f", color: "#F5F0E8" }}>
+    <div className="min-h-screen bg-[#0f0f0f] text-[#F5F0E8]">
       {/* Header */}
-      <div
-        style={{
-          background: "#161616",
-          borderBottom: "1px solid #2a2a2a",
-          padding: "1rem 2rem",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center"
-        }}
-      >
-        <div>
-          <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: "1.2rem" }}>
+      <header className="sticky top-0 z-40 flex items-center justify-between gap-3 border-b border-[#2a2a2a] bg-[#161616]/95 px-4 py-3 backdrop-blur md:px-8">
+        <div className="min-w-0">
+          <div className="truncate font-['Playfair_Display',serif] text-base font-bold md:text-xl">
             LAST NIGHT OF THE YEAR GIRLS
           </div>
-          <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "0.8rem", color: "#888", letterSpacing: "0.15em" }}>
+          <div className="font-['Cormorant_Garamond',serif] text-[0.7rem] tracking-[0.15em] text-[#888] md:text-xs">
             АДМИНИСТРАТИВНАЯ ПАНЕЛЬ
           </div>
         </div>
         <button
           onClick={handleLogout}
-          style={{
-            background: "transparent", border: "1px solid #444", color: "#888",
-            padding: "0.4rem 1rem", fontSize: "0.8rem", cursor: "pointer",
-            fontFamily: "'Inter', sans-serif", letterSpacing: "0.1em"
-          }}
+          className="flex min-h-[40px] shrink-0 items-center gap-2 border border-[#444] px-4 py-2 text-xs tracking-[0.1em] text-[#999] transition-colors duration-200 hover:border-[#C9A96E] hover:text-[#F5F0E8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9A96E] font-['Inter',sans-serif]"
         >
+          <LogOut size={14} strokeWidth={1.75} />
           Выйти
         </button>
-      </div>
+      </header>
 
-      <div style={{ display: "flex", gap: 0 }}>
+      <div className="flex flex-col lg:flex-row">
         {/* Sidebar / Stats */}
-        <div
-          style={{
-            width: "260px",
-            minWidth: "260px",
-            background: "#161616",
-            borderRight: "1px solid #2a2a2a",
-            padding: "1.5rem",
-            minHeight: "calc(100vh - 65px)"
-          }}
-        >
+        <aside className="w-full border-b border-[#2a2a2a] bg-[#161616] p-4 md:p-6 lg:min-h-[calc(100vh-61px)] lg:w-[260px] lg:min-w-[260px] lg:border-b-0 lg:border-r">
           {/* Stats cards */}
-          <div className="space-y-3">
-            <div className="admin-card text-center">
-              <div style={{ fontSize: "2rem", fontFamily: "'Playfair Display', serif", fontWeight: 700, color: "#C41E3A" }}>
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-1">
+            <div className="admin-card p-3.5 text-center md:p-5">
+              <div className="font-['Playfair_Display',serif] text-xl font-bold text-[#C41E3A] md:text-3xl">
                 {paidCount}/{maxSpots}
               </div>
-              <div style={{ fontSize: "0.75rem", color: "#666", letterSpacing: "0.1em" }}>МЕСТ ЗАНЯТО</div>
+              <div className="mt-1 text-[0.65rem] tracking-[0.1em] text-[#666] md:text-xs">МЕСТ ЗАНЯТО</div>
             </div>
 
-            <div className="admin-card text-center">
-              <div style={{ fontSize: "2rem", fontFamily: "'Playfair Display', serif", fontWeight: 700, color: "#7ee39c" }}>
+            <div className="admin-card p-3.5 text-center md:p-5">
+              <div className="font-['Playfair_Display',serif] text-xl font-bold text-[#7ee39c] md:text-3xl">
                 {spotsLeft}
               </div>
-              <div style={{ fontSize: "0.75rem", color: "#666", letterSpacing: "0.1em" }}>СВОБОДНО</div>
+              <div className="mt-1 text-[0.65rem] tracking-[0.1em] text-[#666] md:text-xs">СВОБОДНО</div>
             </div>
 
-            <div className="admin-card text-center">
-              <div style={{ fontSize: "1.6rem", fontFamily: "'Playfair Display', serif", fontWeight: 700, color: "#C9A96E" }}>
+            <div className="admin-card p-3.5 text-center md:p-5">
+              <div className="font-['Playfair_Display',serif] text-lg font-bold text-[#C9A96E] md:text-2xl">
                 {totalRevenue.toLocaleString("ru")} ₽
               </div>
-              <div style={{ fontSize: "0.75rem", color: "#666", letterSpacing: "0.1em" }}>ПОЛУЧЕНО</div>
+              <div className="mt-1 text-[0.65rem] tracking-[0.1em] text-[#666] md:text-xs">ПОЛУЧЕНО</div>
             </div>
 
-            <div className="admin-card text-center">
-              <div style={{ fontSize: "2rem", fontFamily: "'Playfair Display', serif", fontWeight: 700 }}>
+            <div className="admin-card p-3.5 text-center md:p-5">
+              <div className="font-['Playfair_Display',serif] text-xl font-bold md:text-3xl">
                 {total}
               </div>
-              <div style={{ fontSize: "0.75rem", color: "#666", letterSpacing: "0.1em" }}>ВСЕГО ЗАЯВОК</div>
+              <div className="mt-1 text-[0.65rem] tracking-[0.1em] text-[#666] md:text-xs">ВСЕГО ЗАЯВОК</div>
             </div>
           </div>
 
-          {/* Filters */}
-          <div style={{ marginTop: "2rem" }}>
-            <div style={{ fontSize: "0.7rem", letterSpacing: "0.2em", color: "#555", marginBottom: "0.75rem" }}>
+          {/* Filters: горизонтальные чипы на мобильных, вертикальный список на десктопе */}
+          <div className="mt-6">
+            <div className="mb-3 text-[0.7rem] tracking-[0.2em] text-[#555]">
               ФИЛЬТР ПО СТАТУСУ
             </div>
-            <button
-              onClick={() => setFilterStatus("ALL")}
-              style={{
-                display: "block", width: "100%", textAlign: "left",
-                padding: "0.5rem 0.75rem", marginBottom: "0.25rem",
-                background: filterStatus === "ALL" ? "rgba(196,30,58,0.15)" : "transparent",
-                border: filterStatus === "ALL" ? "1px solid rgba(196,30,58,0.4)" : "1px solid transparent",
-                color: filterStatus === "ALL" ? "#F5F0E8" : "#888",
-                fontSize: "0.85rem", cursor: "pointer",
-                fontFamily: "'Inter', sans-serif"
-              }}
-            >
-              Все заявки
-            </button>
-            {ALL_STATUSES.map(s => (
+            <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 lg:mx-0 lg:flex-col lg:gap-0.5 lg:overflow-visible lg:px-0 lg:pb-0">
               <button
-                key={s}
-                onClick={() => setFilterStatus(s)}
-                style={{
-                  display: "block", width: "100%", textAlign: "left",
-                  padding: "0.4rem 0.75rem", marginBottom: "0.2rem",
-                  background: filterStatus === s ? "rgba(196,30,58,0.15)" : "transparent",
-                  border: filterStatus === s ? "1px solid rgba(196,30,58,0.4)" : "1px solid transparent",
-                  color: filterStatus === s ? "#F5F0E8" : "#666",
-                  fontSize: "0.8rem", cursor: "pointer",
-                  fontFamily: "'Inter', sans-serif"
-                }}
+                onClick={() => setFilterStatus("ALL")}
+                className={filterBtnClass(filterStatus === "ALL")}
               >
-                {STATUS_LABELS[s]}
+                Все заявки
               </button>
-            ))}
+              {ALL_STATUSES.map(s => (
+                <button
+                  key={s}
+                  onClick={() => setFilterStatus(s)}
+                  className={filterBtnClass(filterStatus === s)}
+                >
+                  {STATUS_LABELS[s]}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        </aside>
 
         {/* Main content */}
-        <div style={{ flex: 1, padding: "1.5rem", overflow: "auto" }}>
+        <main className="min-w-0 flex-1 overflow-auto p-4 md:p-6">
           {/* Search */}
-          <div style={{ marginBottom: "1.25rem", display: "flex", gap: "0.75rem" }}>
+          <div className="mb-5 flex gap-2 md:gap-3">
             <input
               type="text"
               placeholder="Поиск по имени, Telegram или ID..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              style={{
-                flex: 1, background: "#1a1a1a", border: "1px solid #2a2a2a",
-                color: "#F5F0E8", padding: "0.6rem 1rem", fontSize: "0.9rem",
-                outline: "none", fontFamily: "'Inter', sans-serif"
-              }}
+              className={inputStyle}
             />
             <button
               onClick={fetchApplications}
-              style={{
-                background: "#C41E3A", border: "none", color: "#F5F0E8",
-                padding: "0.6rem 1.2rem", cursor: "pointer", fontSize: "0.85rem",
-                fontFamily: "'Inter', sans-serif"
-              }}
+              disabled={loading}
+              className="flex min-h-[44px] shrink-0 items-center gap-2 bg-[#C41E3A] px-4 text-sm text-[#F5F0E8] transition-colors duration-200 hover:bg-[#a81930] disabled:opacity-60 md:px-5 font-['Inter',sans-serif]"
             >
-              Обновить
+              <RefreshCw size={14} strokeWidth={1.75} className={loading ? "animate-spin" : ""} />
+              <span className="hidden sm:inline">Обновить</span>
             </button>
           </div>
 
           {loading ? (
-            <div style={{ textAlign: "center", padding: "4rem", color: "#555" }}>Загрузка...</div>
+            <div className="py-16 text-center text-[#555]">Загрузка...</div>
           ) : (
-            <div style={{ display: "flex", gap: "1.5rem" }}>
+            <div className="flex flex-col gap-6 lg:flex-row">
               {/* Applications list */}
-              <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="min-w-0 flex-1">
                 {applications.length === 0 ? (
-                  <div style={{ textAlign: "center", padding: "3rem", color: "#555" }}>
+                  <div className="border border-dashed border-[#2a2a2a] py-16 text-center text-[#555]">
                     Заявок не найдено
                   </div>
                 ) : (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                  <div className="flex flex-col gap-2">
                     {applications.map((app) => (
                       <div
                         key={app.id}
-                        onClick={() => { setSelectedApp(app); setNotes(app.adminNotes || ""); setChatId(app.participantChatId || ""); setActionMsg(""); }}
-                        style={{
-                          background: selectedApp?.id === app.id ? "#1e1010" : "#161616",
-                          border: selectedApp?.id === app.id ? "1px solid rgba(196,30,58,0.5)" : "1px solid #2a2a2a",
-                          padding: "1rem 1.25rem",
-                          cursor: "pointer",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          transition: "all 0.2s ease"
-                        }}
+                        onClick={() => openApp(app)}
+                        className={[
+                          "flex cursor-pointer items-center justify-between gap-3 border p-3.5 transition-colors duration-200 md:p-4",
+                          selectedApp?.id === app.id
+                            ? "border-[rgba(196,30,58,0.5)] bg-[#1e1010]"
+                            : "border-[#2a2a2a] bg-[#161616] hover:border-[#3d3d3d] hover:bg-[#1a1a1a]",
+                        ].join(" ")}
                       >
-                        <div>
-                          <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 600, marginBottom: "0.25rem" }}>
+                        <div className="min-w-0">
+                          <div className="mb-1 truncate font-['Playfair_Display',serif] font-semibold">
                             {app.name}
                           </div>
-                          <div style={{ fontSize: "0.75rem", color: "#666", display: "flex", gap: "0.75rem" }}>
+                          <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-[#666]">
                             <span>{app.applicationId}</span>
-                            <span>{app.telegram}</span>
+                            <span className="truncate">{app.telegram}</span>
                             <span>{app.age} лет</span>
                           </div>
                           {app.reservedUntil && app.status === "PAYMENT_PENDING" && (
-                            <div style={{ fontSize: "0.7rem", color: "#C9A96E", marginTop: "0.25rem" }}>
-                              ⏰ Резерв: {timeLeft(app.reservedUntil)}
+                            <div className="mt-1 flex items-center gap-1.5 text-[0.7rem] text-[#C9A96E]">
+                              <Clock size={11} strokeWidth={1.75} />
+                              Резерв: {timeLeft(app.reservedUntil)}
                             </div>
                           )}
                         </div>
-                        <div>
+                        <div className="shrink-0">
                           <span className={`status-badge status-${app.status}`}>
                             {STATUS_LABELS[app.status]}
                           </span>
@@ -331,29 +331,33 @@ export default function AdminDashboard() {
 
               {/* Application detail panel */}
               {selectedApp && (
-                <div
-                  style={{
-                    width: "360px", minWidth: "360px",
-                    background: "#161616", border: "1px solid #2a2a2a",
-                    padding: "1.5rem",
-                    maxHeight: "calc(100vh - 140px)",
-                    overflowY: "auto"
-                  }}
+                <section
+                  role="dialog"
+                  aria-label={`Заявка ${selectedApp.applicationId}`}
+                  className="admin-panel-in fixed inset-0 z-50 overflow-y-auto bg-[#161616] p-4 md:p-6 lg:static lg:z-auto lg:max-h-[calc(100vh-140px)] lg:w-[360px] lg:min-w-[360px] lg:self-start lg:border lg:border-[#2a2a2a]"
                 >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.25rem" }}>
-                    <div>
-                      <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: "1.1rem", marginBottom: "0.25rem" }}>
+                  <button
+                    onClick={() => setSelectedApp(null)}
+                    aria-label="Закрыть карточку заявки"
+                    className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center border border-[#333] text-[#888] transition-colors duration-200 hover:border-[#C9A96E] hover:text-[#F5F0E8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9A96E] lg:hidden"
+                  >
+                    <X size={17} strokeWidth={1.75} />
+                  </button>
+
+                  <div className="mb-5 flex items-start justify-between gap-3 pr-12 lg:pr-0">
+                    <div className="min-w-0">
+                      <div className="mb-1 font-['Playfair_Display',serif] text-lg font-bold">
                         {selectedApp.name}
                       </div>
-                      <div style={{ fontSize: "0.75rem", color: "#666" }}>{selectedApp.applicationId}</div>
+                      <div className="text-xs text-[#666]">{selectedApp.applicationId}</div>
                     </div>
-                    <span className={`status-badge status-${selectedApp.status}`}>
+                    <span className={`status-badge shrink-0 status-${selectedApp.status}`}>
                       {STATUS_LABELS[selectedApp.status]}
                     </span>
                   </div>
 
                   {/* Fields */}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginBottom: "1.5rem" }}>
+                  <div className="mb-6 flex flex-col gap-3">
                     {[
                       { label: "Возраст", value: `${selectedApp.age} лет` },
                       { label: "Telegram", value: selectedApp.telegram },
@@ -364,28 +368,22 @@ export default function AdminDashboard() {
                       { label: "Пожелания", value: selectedApp.wishes || "—" },
                     ].map(f => (
                       <div key={f.label}>
-                        <div style={{ fontSize: "0.7rem", letterSpacing: "0.15em", color: "#555", marginBottom: "0.2rem" }}>
-                          {f.label.toUpperCase()}
-                        </div>
-                        <div style={{ fontSize: "0.9rem", color: "#F5F0E8" }}>{f.value}</div>
+                        <div className={fieldLabel}>{f.label}</div>
+                        <div className="break-words text-sm text-[#F5F0E8]">{f.value}</div>
                       </div>
                     ))}
 
                     <div>
-                      <div style={{ fontSize: "0.7rem", letterSpacing: "0.15em", color: "#555", marginBottom: "0.2rem" }}>
-                        ПОДАНА
-                      </div>
-                      <div style={{ fontSize: "0.85rem", color: "#888" }}>
+                      <div className={fieldLabel}>Подана</div>
+                      <div className="text-sm text-[#888]">
                         {new Date(selectedApp.createdAt).toLocaleString("ru")}
                       </div>
                     </div>
 
                     {selectedApp.reservedUntil && (
                       <div>
-                        <div style={{ fontSize: "0.7rem", letterSpacing: "0.15em", color: "#555", marginBottom: "0.2rem" }}>
-                          РЕЗЕРВ ДО
-                        </div>
-                        <div style={{ fontSize: "0.85rem", color: "#C9A96E" }}>
+                        <div className={fieldLabel}>Резерв до</div>
+                        <div className="text-sm text-[#C9A96E]">
                           {new Date(selectedApp.reservedUntil).toLocaleString("ru")} ({timeLeft(selectedApp.reservedUntil)})
                         </div>
                       </div>
@@ -394,27 +392,23 @@ export default function AdminDashboard() {
 
                   {/* Payments */}
                   {selectedApp.payments.length > 0 && (
-                    <div style={{ marginBottom: "1.5rem" }}>
-                      <div style={{ fontSize: "0.7rem", letterSpacing: "0.2em", color: "#555", marginBottom: "0.5rem" }}>
+                    <div className="mb-6">
+                      <div className="mb-2 text-[0.7rem] tracking-[0.2em] text-[#555]">
                         ПЛАТЕЖИ
                       </div>
                       {selectedApp.payments.map(p => (
                         <div
                           key={p.id}
-                          style={{
-                            background: "#1a1a1a", padding: "0.75rem",
-                            fontSize: "0.85rem", border: "1px solid #2a2a2a",
-                            marginBottom: "0.25rem"
-                          }}
+                          className="mb-1 border border-[#2a2a2a] bg-[#1a1a1a] p-3 text-sm"
                         >
-                          <div style={{ display: "flex", justifyContent: "space-between" }}>
-                            <span>{p.amount.toLocaleString("ru")} ₽</span>
-                            <span style={{ color: p.status === "CONFIRMED" ? "#7ee39c" : "#888" }}>
-                              {p.status === "CONFIRMED" ? "✓ Подтверждён" : p.status === "REFUNDED" ? "↩ Возвращён" : "○ Ожидается"}
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="tabular-nums">{p.amount.toLocaleString("ru")} ₽</span>
+                            <span className={p.status === "CONFIRMED" ? "text-[#7ee39c]" : "text-[#888]"}>
+                              {p.status === "CONFIRMED" ? "Подтверждён" : p.status === "REFUNDED" ? "Возвращён" : "Ожидается"}
                             </span>
                           </div>
                           {p.confirmedAt && (
-                            <div style={{ fontSize: "0.75rem", color: "#555", marginTop: "0.2rem" }}>
+                            <div className="mt-1 text-xs text-[#555]">
                               {new Date(p.confirmedAt).toLocaleString("ru")}
                             </div>
                           )}
@@ -424,60 +418,53 @@ export default function AdminDashboard() {
                   )}
 
                   {/* Chat ID input */}
-                  <div style={{ marginBottom: "0.75rem" }}>
-                    <div style={{ fontSize: "0.7rem", letterSpacing: "0.15em", color: "#555", marginBottom: "0.35rem" }}>
-                      TELEGRAM CHAT ID (для уведомления участницы)
+                  <div className="mb-3">
+                    <div className={`${fieldLabel} normal-case`}>
+                      Telegram Chat ID (для уведомления участницы)
                       {selectedApp.participantChatId && (
-                        <span style={{ color: "#7ee39c" }}> — привязан ботом ✓</span>
+                        <span className="text-[#7ee39c]"> — привязан ботом</span>
                       )}
                     </div>
                     <input
                       type="text"
+                      inputMode="numeric"
                       placeholder="Числовой ID (напр. 123456789)"
                       value={chatId}
                       onChange={(e) => setChatId(e.target.value)}
-                      style={{
-                        width: "100%", background: "#1a1a1a", border: "1px solid #333",
-                        color: "#F5F0E8", padding: "0.5rem 0.75rem", fontSize: "0.85rem",
-                        outline: "none", fontFamily: "'Inter', sans-serif"
-                      }}
+                      className={inputStyle}
                     />
                   </div>
 
                   {/* Notes */}
-                  <div style={{ marginBottom: "1rem" }}>
-                    <div style={{ fontSize: "0.7rem", letterSpacing: "0.15em", color: "#555", marginBottom: "0.35rem" }}>
-                      ЗАМЕТКИ АДМИНИСТРАТОРА
-                    </div>
+                  <div className="mb-4">
+                    <div className={fieldLabel}>Заметки администратора</div>
                     <textarea
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
                       rows={3}
-                      style={{
-                        width: "100%", background: "#1a1a1a", border: "1px solid #333",
-                        color: "#F5F0E8", padding: "0.5rem 0.75rem", fontSize: "0.85rem",
-                        outline: "none", fontFamily: "'Inter', sans-serif", resize: "vertical"
-                      }}
+                      className={`${inputStyle} resize-y`}
                     />
                   </div>
 
                   {/* Action buttons */}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                  <div className="flex flex-col gap-2">
                     {["NEW", "UNDER_REVIEW"].includes(selectedApp.status) && (
                       <>
                         <button
                           onClick={() => handleAction(selectedApp.id, "approve")}
                           disabled={actionLoading}
-                          style={{ ...btnStyle, background: "#1a3a1a", border: "1px solid #2a6a2a", color: "#7ee39c" }}
+                          className={`${actionBtn} border-[#2a6a2a] bg-[#1a3a1a] text-[#7ee39c]`}
                         >
-                          ✓ Одобрить
+                          <Check size={15} strokeWidth={2} />
+                          Одобрить
                         </button>
                         <button
                           onClick={() => handleAction(selectedApp.id, "reject")}
                           disabled={actionLoading}
-                          style={{ ...btnStyle, background: "#3a1a1a", border: "1px solid #6a2a2a", color: "#e37e7e" }}
+                          className={`${actionBtn} border-[#6a2a2a] bg-[#3a1a1a] text-[#e37e7e]`}
                         >
-                          ✕ Отклонить
+                          <X size={15} strokeWidth={2} />
+                          Отклонить
                         </button>
                       </>
                     )}
@@ -486,9 +473,10 @@ export default function AdminDashboard() {
                       <button
                         onClick={() => handleAction(selectedApp.id, "send_payment")}
                         disabled={actionLoading}
-                        style={{ ...btnStyle, background: "#2a1a3a", border: "1px solid #5a2a8a", color: "#c87ee3" }}
+                        className={`${actionBtn} border-[#5a2a8a] bg-[#2a1a3a] text-[#c87ee3]`}
                       >
-                        💳 Отправить реквизиты
+                        <CreditCard size={15} strokeWidth={1.75} />
+                        Отправить реквизиты
                       </button>
                     )}
 
@@ -496,9 +484,10 @@ export default function AdminDashboard() {
                       <button
                         onClick={() => handleAction(selectedApp.id, "confirm_payment")}
                         disabled={actionLoading}
-                        style={{ ...btnStyle, background: "#0d2b0d", border: "1px solid #16a34a", color: "#4ade80" }}
+                        className={`${actionBtn} border-[#16a34a] bg-[#0d2b0d] text-[#4ade80]`}
                       >
-                        ✓ Подтвердить оплату
+                        <Check size={15} strokeWidth={2} />
+                        Подтвердить оплату
                       </button>
                     )}
 
@@ -506,9 +495,10 @@ export default function AdminDashboard() {
                       <button
                         onClick={() => handleAction(selectedApp.id, "refund_pending")}
                         disabled={actionLoading}
-                        style={{ ...btnStyle, background: "#2a1a0a", border: "1px solid #8a4a0a", color: "#e3a87e" }}
+                        className={`${actionBtn} border-[#8a4a0a] bg-[#2a1a0a] text-[#e3a87e]`}
                       >
-                        ↩ Инициировать возврат
+                        <RotateCcw size={15} strokeWidth={1.75} />
+                        Инициировать возврат
                       </button>
                     )}
 
@@ -516,9 +506,10 @@ export default function AdminDashboard() {
                       <button
                         onClick={() => handleAction(selectedApp.id, "refund_complete")}
                         disabled={actionLoading}
-                        style={{ ...btnStyle, background: "#1a2a3a", border: "1px solid #2a5a8a", color: "#7ea8e3" }}
+                        className={`${actionBtn} border-[#2a5a8a] bg-[#1a2a3a] text-[#7ea8e3]`}
                       >
-                        ✓ Возврат выполнен
+                        <Check size={15} strokeWidth={2} />
+                        Возврат выполнен
                       </button>
                     )}
 
@@ -526,8 +517,9 @@ export default function AdminDashboard() {
                       <button
                         onClick={() => handleAction(selectedApp.id, "cancel")}
                         disabled={actionLoading}
-                        style={{ ...btnStyle, background: "#1a1a1a", border: "1px solid #333", color: "#888" }}
+                        className={`${actionBtn} border-[#333] bg-[#1a1a1a] text-[#888] hover:text-[#F5F0E8]`}
                       >
+                        <Ban size={15} strokeWidth={1.75} />
                         Отменить заявку
                       </button>
                     )}
@@ -535,33 +527,31 @@ export default function AdminDashboard() {
                     <button
                       onClick={() => handleAction(selectedApp.id, "update_notes")}
                       disabled={actionLoading}
-                      style={{ ...btnStyle, background: "#1a1a1a", border: "1px solid #333", color: "#aaa" }}
+                      className={`${actionBtn} border-[#333] bg-[#1a1a1a] text-[#aaa] hover:text-[#F5F0E8]`}
                     >
+                      <Save size={15} strokeWidth={1.75} />
                       Сохранить заметки
                     </button>
                   </div>
 
                   {actionMsg && (
-                    <div style={{ marginTop: "0.75rem", padding: "0.5rem", background: "#1a1a1a", fontSize: "0.85rem", textAlign: "center" }}>
-                      {actionMsg}
+                    <div
+                      role="status"
+                      className={`mt-3 border p-2.5 text-center text-sm ${
+                        actionMsg.ok
+                          ? "border-[rgba(74,222,128,0.35)] bg-[rgba(74,222,128,0.08)] text-[#4ade80]"
+                          : "border-[rgba(196,30,58,0.4)] bg-[rgba(196,30,58,0.1)] text-[#e37e7e]"
+                      }`}
+                    >
+                      {actionMsg.text}
                     </div>
                   )}
-                </div>
+                </section>
               )}
             </div>
           )}
-        </div>
+        </main>
       </div>
     </div>
   );
 }
-
-const btnStyle: React.CSSProperties = {
-  padding: "0.6rem 1rem",
-  fontSize: "0.85rem",
-  cursor: "pointer",
-  fontFamily: "'Inter', sans-serif",
-  transition: "opacity 0.2s",
-  textAlign: "center",
-  width: "100%",
-};
