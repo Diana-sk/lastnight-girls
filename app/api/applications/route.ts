@@ -139,18 +139,25 @@ export async function POST(req: NextRequest) {
       }),
     );
 
-    // Notify organizer (в фоне — не блокируем ответ участнице)
-    void notifyOrganizerNewApplication({
-      applicationId: application.applicationId,
-      name: application.name,
-      age: application.age,
-      telegram: application.telegram,
-      contact: application.contact,
-      wishes: application.wishes,
-      allergies: application.allergies,
-      foodWishes: application.foodWishes,
-      secretChapter: application.secretChapter,
-    }).catch((err) => console.error("Telegram notify failed:", err));
+    // Notify organizer. ВАЖНО: нельзя отправлять «в фоне» через void —
+    // Vercel замораживает serverless-функцию сразу после ответа,
+    // и фоновый fetch до Telegram не доходит. Ждём явно.
+    try {
+      await notifyOrganizerNewApplication({
+        applicationId: application.applicationId,
+        name: application.name,
+        age: application.age,
+        telegram: application.telegram,
+        contact: application.contact,
+        wishes: application.wishes,
+        allergies: application.allergies,
+        foodWishes: application.foodWishes,
+        secretChapter: application.secretChapter,
+      });
+    } catch (err) {
+      // Уведомление не должно ломать приём заявки
+      console.error("Telegram notify failed:", err);
+    }
 
     return NextResponse.json({
       success: true,
