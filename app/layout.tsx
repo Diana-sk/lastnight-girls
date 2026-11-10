@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_ADMIN_URL || "https://lastnight-girls.ru"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_ADMIN_URL || "https://lastnight-girls.vercel.app"),
   title: "LAST NIGHT OF THE YEAR GIRLS · Закрытая новогодняя вечеринка в Санкт-Петербурге",
   description:
     "Последняя большая ночь этого года. Только девушки, роскошные образы, ролевая игра, подарок от организатора и шампанское. 19–20 декабря 2026, Санкт-Петербург.",
