@@ -47,7 +47,13 @@ export async function notifyOrganizerNewApplication(app: {
   wishes?: string | null;
   allergies?: string | null;
   foodWishes?: string | null;
+  secretChapter?: string | null;
 }) {
+  const secretChapterLabels: Record<string, string> = {
+    yes: "да",
+    no: "нет",
+    unsure: "затрудняется",
+  };
   const text = `
 🔔 <b>Новая заявка!</b>
 
@@ -58,6 +64,7 @@ export async function notifyOrganizerNewApplication(app: {
 📞 Контакт: ${app.contact}
 ${app.allergies ? `⚠️ Аллергии: ${app.allergies}` : ""}
 ${app.foodWishes ? `🍽️ Пожелания к закускам: ${app.foodWishes}` : ""}
+${app.secretChapter ? `🌙 Секретная глава (00:00–06:00): ${secretChapterLabels[app.secretChapter] || app.secretChapter}` : ""}
 ${app.wishes ? `💬 Пожелания: ${app.wishes}` : ""}
 
 👉 Зайди в <a href="${process.env.NEXT_PUBLIC_ADMIN_URL}/admin">админ-панель</a> для рассмотрения.

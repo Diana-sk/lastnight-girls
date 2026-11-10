@@ -17,6 +17,7 @@ interface Application {
   wishes: string | null;
   allergies: string | null;
   foodWishes: string | null;
+  secretChapter: string | null;
   status: ApplicationStatus;
   isWaitlist: boolean;
   reservedUntil: string | null;
@@ -359,6 +360,7 @@ export default function AdminDashboard() {
                       { label: "Контакт", value: selectedApp.contact },
                       { label: "Аллергии", value: selectedApp.allergies || "—" },
                       { label: "Пожелания к еде", value: selectedApp.foodWishes || "—" },
+                      { label: "Секретная глава (00:00–06:00)", value: selectedApp.secretChapter ? ({ yes: "Да", no: "Нет", unsure: "Затрудняется" } as Record<string, string>)[selectedApp.secretChapter] || selectedApp.secretChapter : "—" },
                       { label: "Пожелания", value: selectedApp.wishes || "—" },
                     ].map(f => (
                       <div key={f.label}>
