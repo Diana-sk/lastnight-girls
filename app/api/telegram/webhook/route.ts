@@ -148,7 +148,8 @@ export async function POST(req: NextRequest) {
         `🖤 Привет, ${firstName}!`,
         "",
         `Твоя заявка <b>${application.applicationId}</b> привязана к этому чату.`,
-        statusLine[application.status] || "Все новости и ответ организатора придут сюда.",
+        statusLine[application.status],
+        "Все новости и ответ организатора придут сюда. Следи за сообщениями 🥂",
         "",
         "LAST NIGHT OF THE YEAR GIRLS",
       ].join("\n")
