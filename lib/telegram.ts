@@ -36,6 +36,30 @@ export async function sendMessageToUser(chatId: string | number, text: string) {
   return sendMessage(chatId, text);
 }
 
+// Отправка фото по публичному URL (Telegram сам скачивает картинку).
+async function sendPhoto(chatId: string | number, photoUrl: string, caption: string) {
+  try {
+    const res = await fetch(`${BASE_URL}/sendPhoto`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: chatId,
+        photo: photoUrl,
+        caption,
+        parse_mode: "HTML",
+      }),
+      signal: AbortSignal.timeout(8000),
+    });
+    const data = await res.json();
+    if (!data.ok) {
+      console.error("Telegram sendPhoto error:", data.description);
+    }
+    return data;
+  } catch (err) {
+    console.error("Failed to send Telegram photo:", err);
+  }
+}
+
 // ─── TO ORGANIZER ──────────────────────────────────────────────
 
 export async function notifyOrganizerNewApplication(app: {
@@ -71,6 +95,11 @@ ${app.wishes ? `💬 Пожелания: ${app.wishes}` : ""}
   `.trim();
 
   await sendMessage(ORGANIZER_CHAT_ID, text);
+
+  // Афиша к уведомлению — актуальный постер с сайта.
+  // Не критично: если картинка не ушла, текст уже доставлен.
+  const siteUrl = (process.env.NEXT_PUBLIC_ADMIN_URL || "https://lastnight-girls.vercel.app").replace(/\/$/, "");
+  await sendPhoto(ORGANIZER_CHAT_ID, `${siteUrl}/images/poster.jpg`, "🖤 Актуальная афиша вечеринки");
 }
 
 export async function notifyOrganizerPaymentConfirmed(app: {
