@@ -75,7 +75,10 @@ export async function POST(req: NextRequest) {
     if (payload && /^LNG-\d+$/i.test(payload)) {
       application = await withDbRetry(() =>
         prisma.application.findFirst({
-          where: { applicationId: payload.toUpperCase() },
+          where: {
+            applicationId: payload.toUpperCase(),
+            status: { notIn: ["REJECTED", "CANCELLED", "REFUNDED"] },
+          },
           orderBy: { createdAt: "desc" },
         })
       );
@@ -126,13 +129,26 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Сообщение зависит от реального статуса заявки, чтобы не обещать
+    // «подтверждение», которого организатор ещё не давал.
+    const statusLine: Record<string, string> = {
+      NEW: "Она принята и ждёт рассмотрения — как только организатор примет решение, ответ придёт сюда.",
+      UNDER_REVIEW: "Она сейчас на рассмотрении — как только организатор примет решение, ответ придёт сюда.",
+      WAITLIST: "Ты в листе ожидания — если освободится место, организатор напишет сюда.",
+      APPROVED: "Она одобрена! Организатор скоро отправит реквизиты для оплаты.",
+      PAYMENT_PENDING: "Она одобрена — ждём оплату. Реквизиты уже у тебя в переписке с организатором.",
+      PAID: "Оплата подтверждена — до встречи на вечеринке!",
+      REFUND_PENDING: "По заявке идёт возврат средств — организатор напишет сюда.",
+      EXPIRED: "Резерв места истёк. Если хочешь вернуться — напиши организатору.",
+    };
+
     await sendMessageToUser(
       chatId,
       [
         `🖤 Привет, ${firstName}!`,
         "",
-        `Твоя заявка <b>${application.applicationId}</b> подтверждена и привязана к этому чату.`,
-        "Все новости и ответ организатора придут сюда. Следи за сообщениями 🥂",
+        `Твоя заявка <b>${application.applicationId}</b> привязана к этому чату.`,
+        statusLine[application.status] || "Все новости и ответ организатора придут сюда.",
         "",
         "LAST NIGHT OF THE YEAR GIRLS",
       ].join("\n")
