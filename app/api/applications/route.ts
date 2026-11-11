@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { notifyOrganizerNewApplication } from "@/lib/telegram";
+import { notifyOrganizerNewApplication, notifyParticipantApplicationReceived } from "@/lib/telegram";
 
 // Neon (serverless Postgres) может разорвать соединение из пула (P1017) —
 // повторяем операцию на свежем коннекте.
@@ -157,6 +157,31 @@ export async function POST(req: NextRequest) {
     } catch (err) {
       // Уведомление не должно ломать приём заявки
       console.error("Telegram notify failed:", err);
+    }
+
+    // Подтверждение участнице. Бот может писать первым только тем, кто уже
+    // запускал его (/start) — ищем привязанный chat_id по прежним заявкам
+    // этого же ника (статус не важен: старая отклонённая заявка тоже хранит
+    // привязку). Если не нашли — участница получит сообщение от бота,
+    // как только сама нажмёт /start (вебхук привяжет чат).
+    try {
+      const bound = await withDbRetry(() =>
+        prisma.application.findFirst({
+          where: { telegram: cleanTelegram, participantChatId: { not: null } },
+          orderBy: { createdAt: "desc" },
+          select: { participantChatId: true },
+        })
+      );
+      if (bound?.participantChatId) {
+        await notifyParticipantApplicationReceived(
+          bound.participantChatId,
+          application.name,
+          application.applicationId,
+          isFull
+        );
+      }
+    } catch (err) {
+      console.error("Telegram participant notify failed:", err);
     }
 
     return NextResponse.json({

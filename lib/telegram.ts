@@ -129,28 +129,31 @@ export async function notifyOrganizerParticipantLinked(app: {
 
 // ─── TO PARTICIPANT ────────────────────────────────────────────
 
+// Подтверждение получения заявки. Telegram позволяет писать пользователю
+// только после того, как она сама запустила бота (/start) — поэтому chat_id
+// ищется по предыдущим заявкам этого же ника; если не найден, сообщение
+// просто не отправится (пользователь получит весточку при первом /start).
 export async function notifyParticipantApplicationReceived(
-  telegramUsername: string,
-  applicationId: string
+  chatId: string | number,
+  name: string,
+  applicationId: string,
+  isWaitlist = false
 ) {
-  // Note: We can only message users who have started the bot first
-  // So we send via username-based approach (requires user to have messaged bot)
   const text = `
-🖤 Привет!
+🖤 Привет, ${name}!
 
 Мы получили твою заявку на <b>LAST NIGHT OF THE YEAR GIRLS</b>.
 
 📋 Номер заявки: <code>${applicationId}</code>
 
-Организатор рассмотрит её в ближайшее время и свяжется с тобой здесь. 
+${isWaitlist
+  ? "Все основные места сейчас заняты — ты в листе ожидания. Если освободится место, мы напишем тебе первым делом."
+  : "Организатор рассмотрит её в ближайшее время и свяжется с тобой здесь."}
 
 Следи за сообщениями! 🥂
   `.trim();
 
-  // Since we can't initiate a conversation by username alone,
-  // this will be queued and sent when we have their chat_id.
-  // For now, log it - actual delivery happens after user starts bot.
-  console.log(`[Telegram] Would notify ${telegramUsername}: ${text}`);
+  await sendMessage(chatId, text);
 }
 
 export async function notifyParticipantApproved(
