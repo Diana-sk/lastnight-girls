@@ -178,7 +178,7 @@ export default function HeroSection() {
             </button>
             <div className="relative w-full aspect-[2/3] max-h-[85vh] rounded-2xl overflow-hidden border-2 border-[#C8A86B]/40 shadow-2xl">
               <Image
-                src="/images/poster.jpg"
+                src="/images/poster-v2.jpg"
                 alt="Last Night of the Year Girls Poster"
                 fill
                 className="object-contain"

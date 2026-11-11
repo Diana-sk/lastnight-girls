@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/images/poster.jpg",
+        url: "/images/poster-v2.jpg",
         width: 1024,
         height: 1536,
         alt: "Last Night of the Year Girls Poster",

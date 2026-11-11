@@ -99,7 +99,7 @@ ${app.wishes ? `💬 Пожелания: ${app.wishes}` : ""}
   // Афиша к уведомлению — актуальный постер с сайта.
   // Не критично: если картинка не ушла, текст уже доставлен.
   const siteUrl = (process.env.NEXT_PUBLIC_ADMIN_URL || "https://lastnight-girls.vercel.app").replace(/\/$/, "");
-  await sendPhoto(ORGANIZER_CHAT_ID, `${siteUrl}/images/poster.jpg`, "🖤 Актуальная афиша вечеринки");
+  await sendPhoto(ORGANIZER_CHAT_ID, `${siteUrl}/images/poster-v2.jpg`, "🖤 Актуальная афиша вечеринки");
 }
 
 export async function notifyOrganizerPaymentConfirmed(app: {
