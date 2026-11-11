@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   X,
@@ -91,7 +91,7 @@ export default function AdminDashboard() {
   const [chatId, setChatId] = useState("");
   const [actionMsg, setActionMsg] = useState<{ text: string; ok: boolean } | null>(null);
 
-  const fetchApplications = async () => {
+  const fetchApplications = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -111,9 +111,14 @@ export default function AdminDashboard() {
       console.error(err);
     }
     setLoading(false);
-  };
+  }, [filterStatus, search, router]);
 
-  useEffect(() => { fetchApplications(); }, [filterStatus, search]);
+  // Загрузка при смене фильтра/поиска. Отложенный вызов, чтобы не дергать
+  // setState синхронно в теле эффекта; cleanup отменяет устаревший запрос.
+  useEffect(() => {
+    const t = setTimeout(fetchApplications, 0);
+    return () => clearTimeout(t);
+  }, [fetchApplications]);
 
   // Esc закрывает карточку заявки (актуально на мобильных, где это оверлей)
   useEffect(() => {
@@ -161,9 +166,18 @@ export default function AdminDashboard() {
     setActionMsg(null);
   };
 
+  // Текущее время: обновляется раз в минуту, таймеры резерва идут без перерендера
+  const [now, setNow] = useState(0);
+  useEffect(() => {
+    const tick = () => setNow(Date.now());
+    const initial = setTimeout(tick, 0);
+    const interval = setInterval(tick, 60000);
+    return () => { clearTimeout(initial); clearInterval(interval); };
+  }, []);
+
   const timeLeft = (reservedUntil: string | null) => {
-    if (!reservedUntil) return null;
-    const diff = new Date(reservedUntil).getTime() - Date.now();
+    if (!reservedUntil || !now) return null;
+    const diff = new Date(reservedUntil).getTime() - now;
     if (diff <= 0) return "Истёк";
     const h = Math.floor(diff / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
